@@ -1,38 +1,18 @@
 'use client';
 
-import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
-import { havensApi } from '@/lib/api/havens';
 import { useHavenStore } from '@/lib/stores/haven-store';
-import type { Haven } from '@/lib/types/haven';
 
 export default function HavenDetailPage() {
     const params = useParams();
     const havenId = params.havenId as string;
-    const setCurrentHaven = useHavenStore((s) => s.setCurrentHaven);
-    const [haven, setHaven] = useState<Haven | null>(null);
-    const [loading, setLoading] = useState(true);
+    const haven = useHavenStore((s) => s.currentHaven);
 
-    useEffect(() => {
-        havensApi
-            .get(havenId)
-            .then(({ data: res }) => {
-                if (res.success && res.data) {
-                    setHaven(res.data);
-                    setCurrentHaven(res.data);
-                }
-            })
-            .finally(() => setLoading(false));
-
-        return () => setCurrentHaven(null);
-    }, [havenId, setCurrentHaven]);
-
-    if (loading) return <Skeleton className="h-64 rounded-lg" />;
-    if (!haven) return <p>Haven not found</p>;
+    if (!haven || haven.id !== havenId) return <Skeleton className="h-64 rounded-lg" />;
 
     const links = [
         { label: 'Content', href: `/havens/${havenId}/content`, count: haven.contentCount },

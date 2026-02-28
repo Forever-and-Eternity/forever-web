@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 
 export function ThemeToggle() {
-    const { theme, setTheme } = useTheme();
+    const { resolvedTheme, setTheme } = useTheme();
     const [mounted, setMounted] = useState(false);
 
     useEffect(() => {
@@ -22,11 +22,11 @@ export function ThemeToggle() {
             size="sm"
             className="w-9 h-9"
             onClick={() => {
-                setTheme(theme === 'dark' ? 'light' : 'dark');
+                setTheme(resolvedTheme === 'dark' ? 'light' : 'dark');
             }}
             aria-label="Toggle theme"
         >
-            {theme === 'dark' ? '☀️' : '🌙'}
+            {resolvedTheme === 'dark' ? '☀️' : '🌙'}
         </Button>
     );
 }

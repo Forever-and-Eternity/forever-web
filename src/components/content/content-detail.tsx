@@ -1,19 +1,35 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Separator } from '@/components/ui/separator';
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+    AlertDialogTrigger,
+} from '@/components/ui/alert-dialog';
 import { AnnotationList } from '@/components/annotations/annotation-list';
 import { AnnotationForm } from '@/components/annotations/annotation-form';
 import { PersonTagDialog } from '@/components/people/person-tag-dialog';
 import { contentApi } from '@/lib/api/content';
 import { ContentTypeLabels } from '@/lib/types/enums';
 import type { ContentItem } from '@/lib/types/content';
+import { toast } from 'sonner';
 
 export function ContentDetail({ havenId, contentId }: { havenId: string; contentId: string }) {
+    const router = useRouter();
     const [item, setItem] = useState<ContentItem | null>(null);
     const [loading, setLoading] = useState(true);
+    const [deleting, setDeleting] = useState(false);
 
     function refresh() {
         contentApi.get(havenId, contentId).then(({ data: res }) => {
@@ -30,6 +46,23 @@ export function ContentDetail({ havenId, contentId }: { havenId: string; content
             .finally(() => setLoading(false));
     }, [havenId, contentId]);
 
+    async function handleDelete() {
+        setDeleting(true);
+        try {
+            const { data: res } = await contentApi.delete(havenId, contentId);
+            if (res.success) {
+                toast.success('Content deleted');
+                router.push(`/havens/${havenId}/content`);
+            } else {
+                toast.error('Failed to delete content');
+            }
+        } catch {
+            toast.error('Failed to delete content');
+        } finally {
+            setDeleting(false);
+        }
+    }
+
     if (loading) return <Skeleton className="h-96 rounded-lg" />;
     if (!item) return <p>Content not found</p>;
 
@@ -42,8 +75,33 @@ export function ContentDetail({ havenId, contentId }: { havenId: string; content
                     </div>
                 )}
                 <div className="mt-4">
-                    <h2 className="text-xl font-bold">{item.title || 'Untitled'}</h2>
-                    {item.description && <p className="mt-1 text-muted-foreground">{item.description}</p>}
+                    <div className="flex items-start justify-between gap-4">
+                        <div>
+                            <h2 className="text-xl font-bold">{item.title || 'Untitled'}</h2>
+                            {item.description && <p className="mt-1 text-muted-foreground">{item.description}</p>}
+                        </div>
+                        <AlertDialog>
+                            <AlertDialogTrigger asChild>
+                                <Button variant="destructive" size="sm">
+                                    Delete
+                                </Button>
+                            </AlertDialogTrigger>
+                            <AlertDialogContent>
+                                <AlertDialogHeader>
+                                    <AlertDialogTitle>Delete content?</AlertDialogTitle>
+                                    <AlertDialogDescription>
+                                        This will permanently remove this content and all its annotations. This action cannot be undone.
+                                    </AlertDialogDescription>
+                                </AlertDialogHeader>
+                                <AlertDialogFooter>
+                                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                    <AlertDialogAction onClick={handleDelete} disabled={deleting}>
+                                        {deleting ? 'Deleting...' : 'Delete'}
+                                    </AlertDialogAction>
+                                </AlertDialogFooter>
+                            </AlertDialogContent>
+                        </AlertDialog>
+                    </div>
                     <div className="mt-3 flex flex-wrap gap-2">
                         <Badge>{ContentTypeLabels[item.contentType]}</Badge>
                         {item.uploaderDisplayName && <Badge variant="outline">by {item.uploaderDisplayName}</Badge>}
