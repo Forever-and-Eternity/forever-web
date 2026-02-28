@@ -40,10 +40,10 @@ export function LoginForm() {
     }
 
     return (
-        <Card className="w-full max-w-md">
+        <Card className="w-full max-w-md shadow-lg">
             <CardHeader className="text-center">
-                <CardTitle className="text-2xl">Welcome back</CardTitle>
-                <CardDescription>Sign in to your Forever account</CardDescription>
+                <CardTitle className="text-2xl" style={{ fontFamily: 'var(--font-display-var), serif' }}>Welcome back</CardTitle>
+                <CardDescription>Sign in to your <span className="text-gradient-ig font-semibold">Forever</span> account</CardDescription>
             </CardHeader>
             <CardContent>
                 <form onSubmit={handleSubmit} className="space-y-4">
@@ -63,7 +63,7 @@ export function LoginForm() {
                         <Label htmlFor="password">Password</Label>
                         <Input id="password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} required />
                     </div>
-                    <Button type="submit" className="w-full" disabled={loading}>
+                    <Button type="submit" className="w-full bg-gradient-ig text-white hover:opacity-90 font-semibold" disabled={loading}>
                         {loading ? 'Signing in...' : 'Sign in'}
                     </Button>
                     <p className="text-center text-sm text-muted-foreground">

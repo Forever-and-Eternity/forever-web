@@ -1,6 +1,13 @@
 import api from './client';
 import type { ApiResponse } from '@/lib/types/api';
-import type { LoginRequest, LoginResponse, RegisterRequest, UpdateProfileRequest, UserProfile } from '@/lib/types/auth';
+import type {
+    LoginRequest,
+    LoginResponse,
+    RegisterRequest,
+    UpdateProfileRequest,
+    UserPreferences,
+    UserProfile,
+} from '@/lib/types/auth';
 
 export const authApi = {
     register: (data: RegisterRequest) => api.post<ApiResponse<LoginResponse>>('/auth/register', data),
@@ -12,4 +19,8 @@ export const authApi = {
     getProfile: () => api.get<ApiResponse<UserProfile>>('/auth/me'),
 
     updateProfile: (data: UpdateProfileRequest) => api.put<ApiResponse<UserProfile>>('/auth/me', data),
+
+    getPreferences: () => api.get<ApiResponse<UserPreferences>>('/auth/preferences'),
+
+    updatePreferences: (data: UserPreferences) => api.put<ApiResponse<UserPreferences>>('/auth/preferences', data),
 };

@@ -23,7 +23,7 @@ export function MemberInviteDialog({ havenId }: { havenId: string }) {
         try {
             const { data: res } = await havensApi.inviteMember(havenId, {
                 email,
-                role: Number(role) as HavenRole,
+                role: role as HavenRole,
             });
             if (res.success) {
                 toast.success('Invitation sent');

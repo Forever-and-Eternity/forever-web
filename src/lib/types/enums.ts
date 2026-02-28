@@ -1,30 +1,30 @@
 export enum ContentType {
-    Photo = 0,
-    Video = 1,
-    Audio = 2,
-    Text = 3,
-    Document = 4,
+    Photo = 'Photo',
+    Video = 'Video',
+    Audio = 'Audio',
+    Text = 'Text',
+    Document = 'Document',
 }
 
 export enum HavenRole {
-    Owner = 0,
-    Contributor = 1,
-    Recipient = 2,
+    Owner = 'Owner',
+    Contributor = 'Contributor',
+    Recipient = 'Recipient',
 }
 
 export enum AnnotationType {
-    MemoryNote = 0,
-    Location = 1,
-    DateContext = 2,
-    Lesson = 3,
+    MemoryNote = 'MemoryNote',
+    Location = 'Location',
+    DateContext = 'DateContext',
+    Lesson = 'Lesson',
 }
 
 export enum InviteStatus {
-    Sent = 0,
-    Opened = 1,
-    Registered = 2,
-    Expired = 3,
-    Declined = 4,
+    Sent = 'Sent',
+    Opened = 'Opened',
+    Registered = 'Registered',
+    Expired = 'Expired',
+    Declined = 'Declined',
 }
 
 export const ContentTypeLabels: Record<ContentType, string> = {

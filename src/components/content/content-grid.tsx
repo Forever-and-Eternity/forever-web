@@ -18,7 +18,7 @@ export function ContentGrid({ havenId }: { havenId: string }) {
 
     useEffect(() => {
         setLoading(true);
-        const type = typeFilter === 'all' ? undefined : (Number(typeFilter) as ContentType);
+        const type = typeFilter === 'all' ? undefined : (typeFilter as ContentType);
         contentApi
             .list(havenId, page, 20, type)
             .then(({ data: res }) => {

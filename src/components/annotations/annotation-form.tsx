@@ -21,7 +21,7 @@ export function AnnotationForm({ contentId, onCreated }: { contentId: string; on
         try {
             await annotationsApi.create(contentId, {
                 body,
-                annotationType: Number(type) as AnnotationType,
+                annotationType: type as AnnotationType,
             });
             setBody('');
             toast.success('Annotation added');

@@ -45,10 +45,10 @@ export function RegisterForm() {
     }
 
     return (
-        <Card className="w-full max-w-md">
+        <Card className="w-full max-w-md shadow-lg">
             <CardHeader className="text-center">
-                <CardTitle className="text-2xl">Create your account</CardTitle>
-                <CardDescription>Start preserving memories forever</CardDescription>
+                <CardTitle className="text-2xl" style={{ fontFamily: 'var(--font-display-var), serif' }}>Create your account</CardTitle>
+                <CardDescription>Start preserving memories <span className="text-gradient-ig font-semibold">forever</span></CardDescription>
             </CardHeader>
             <CardContent>
                 <form onSubmit={handleSubmit} className="space-y-4">
@@ -86,7 +86,7 @@ export function RegisterForm() {
                             minLength={8}
                         />
                     </div>
-                    <Button type="submit" className="w-full" disabled={loading}>
+                    <Button type="submit" className="w-full bg-gradient-ig text-white hover:opacity-90 font-semibold" disabled={loading}>
                         {loading ? 'Creating account...' : 'Create account'}
                     </Button>
                     <p className="text-center text-sm text-muted-foreground">

@@ -14,10 +14,20 @@ export interface RefreshRequest {
     refreshToken: string;
 }
 
+export interface UserPreferences {
+    theme: string;
+    locale: string;
+    compactMode: boolean;
+    contentLayout: string;
+    showAnnotationsInFeed: boolean;
+    emailNotifications: boolean;
+}
+
 export interface UpdateProfileRequest {
     displayName?: string;
     avatarUrl?: string;
     dateOfBirth?: string;
+    preferences?: UserPreferences;
 }
 
 export interface LoginResponse {
@@ -33,4 +43,5 @@ export interface UserProfile {
     avatarUrl?: string;
     dateOfBirth?: string;
     createdAt: string;
+    preferences: UserPreferences;
 }
