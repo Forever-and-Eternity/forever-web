@@ -76,7 +76,7 @@ function applyLivePreview(palette: string, font: string) {
 
 export function SettingsForm() {
     const { user, setUser } = useAuthStore();
-    const { theme: currentTheme, setTheme } = useTheme();
+    const { theme: currentTheme, resolvedTheme, setTheme } = useTheme();
     const [loading, setLoading] = useState(false);
     const [profileLoading, setProfileLoading] = useState(false);
     const [avatarUploading, setAvatarUploading] = useState(false);
@@ -233,7 +233,7 @@ export function SettingsForm() {
         applyLivePreview(preferences.colorPalette, newFont);
     }
 
-    const isDark = currentTheme === 'dark';
+    const isDark = resolvedTheme === 'dark';
 
     return (
         <div className="max-w-2xl space-y-6">

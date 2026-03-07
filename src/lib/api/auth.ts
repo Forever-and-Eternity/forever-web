@@ -25,14 +25,14 @@ export const authApi = {
 
     updatePreferences: (data: UserPreferences) => api.put<ApiResponse<UserPreferences>>('/auth/preferences', data),
 
-    getAvatarUploadUrl: (fileName: string, fileSize: number) =>
-        api.post<ApiResponse<{ presignedUrl: string; avatarKey: string }>>('/auth/avatar-upload-url', { fileName, fileSize }),
+    getAvatarUploadUrl: (fileName: string, fileSize: number, contentType: string) =>
+        api.post<ApiResponse<{ presignedUrl: string; avatarKey: string }>>('/auth/avatar-upload-url', { fileName, fileSize, contentType }),
 
     confirmAvatar: (avatarKey: string) =>
         api.put<ApiResponse<UserProfile>>('/auth/avatar-confirm', { avatarKey }),
 
     async uploadAvatar(file: File): Promise<UserProfile | null> {
-        const { data: urlRes } = await this.getAvatarUploadUrl(file.name, file.size);
+        const { data: urlRes } = await this.getAvatarUploadUrl(file.name, file.size, file.type || 'image/jpeg');
         if (!urlRes.success || !urlRes.data) return null;
 
         await axios.put(urlRes.data.presignedUrl, file, {
