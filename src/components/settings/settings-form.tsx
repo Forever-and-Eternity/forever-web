@@ -1,7 +1,8 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useTheme } from 'next-themes';
+import { Camera, Check, Loader2, Monitor, Moon, Sun } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -13,13 +14,75 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { authApi } from '@/lib/api/auth';
 import { useAuthStore } from '@/lib/stores/auth-store';
 import type { UserPreferences } from '@/lib/types/auth';
+import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
+
+/* ─── Palette config ─── */
+const PALETTES = [
+    {
+        key: 'lavender',
+        label: 'Lavender',
+        lightColors: { bg: '#f5f3f8', primary: '#7c3aed', secondary: '#e879a8' },
+        darkColors: { bg: '#0d0f1e', primary: '#a78bfa', secondary: '#f0abcb' },
+    },
+    {
+        key: 'sapphire',
+        label: 'Sapphire',
+        lightColors: { bg: '#f2f5f9', primary: '#2563eb', secondary: '#38bdf8' },
+        darkColors: { bg: '#0c1527', primary: '#60a5fa', secondary: '#67e8f9' },
+    },
+    {
+        key: 'rose',
+        label: 'Rose',
+        lightColors: { bg: '#faf6f4', primary: '#e11d48', secondary: '#f97316' },
+        darkColors: { bg: '#0e0f1c', primary: '#fb7185', secondary: '#fdba74' },
+    },
+    {
+        key: 'emerald',
+        label: 'Emerald',
+        lightColors: { bg: '#f3f6f4', primary: '#0d9488', secondary: '#22c55e' },
+        darkColors: { bg: '#0b1219', primary: '#2dd4bf', secondary: '#4ade80' },
+    },
+    {
+        key: 'bubblegum',
+        label: 'Bubblegum',
+        lightColors: { bg: '#faf4f7', primary: '#ec4899', secondary: '#a855f7' },
+        darkColors: { bg: '#120b16', primary: '#f472b6', secondary: '#c084fc' },
+    },
+] as const;
+
+/* ─── Font config ─── */
+const FONTS = [
+    { key: 'nunito', label: 'Nunito', category: 'Rounded', cssVar: '--font-nunito' },
+    { key: 'plus-jakarta-sans', label: 'Plus Jakarta Sans', category: 'Geometric', cssVar: '--font-plus-jakarta-sans' },
+    { key: 'outfit', label: 'Outfit', category: 'Geometric', cssVar: '--font-outfit' },
+    { key: 'dm-sans', label: 'DM Sans', category: 'Neutral', cssVar: '--font-dm-sans' },
+    { key: 'manrope', label: 'Manrope', category: 'Neutral', cssVar: '--font-manrope' },
+    { key: 'sora', label: 'Sora', category: 'Modern', cssVar: '--font-sora' },
+    { key: 'space-grotesk', label: 'Space Grotesk', category: 'Sharp', cssVar: '--font-space-grotesk' },
+] as const;
+
+const THEME_OPTIONS = [
+    { key: 'system', label: 'System', icon: Monitor },
+    { key: 'light', label: 'Light', icon: Sun },
+    { key: 'dark', label: 'Dark', icon: Moon },
+] as const;
+
+function applyLivePreview(palette: string, font: string) {
+    const root = document.documentElement;
+    root.setAttribute('data-palette', palette);
+    root.setAttribute('data-font', font);
+}
 
 export function SettingsForm() {
     const { user, setUser } = useAuthStore();
-    const { setTheme } = useTheme();
+    const { theme: currentTheme, setTheme } = useTheme();
     const [loading, setLoading] = useState(false);
     const [profileLoading, setProfileLoading] = useState(false);
+    const [avatarUploading, setAvatarUploading] = useState(false);
+    const fileInputRef = useRef<HTMLInputElement>(null);
+    const savedRef = useRef(false);
+    const initialPrefsRef = useRef<{ palette: string; font: string; theme: string } | null>(null);
 
     // Profile fields
     const [displayName, setDisplayName] = useState(user?.displayName || '');
@@ -33,21 +96,40 @@ export function SettingsForm() {
         contentLayout: 'grid',
         showAnnotationsInFeed: true,
         emailNotifications: true,
+        colorPalette: 'lavender',
+        fontFamily: 'nunito',
     });
 
     useEffect(() => {
         authApi.getPreferences().then(({ data: res }) => {
             if (res.success && res.data) {
-                setPreferences({
+                const prefs = {
                     theme: res.data.theme || 'system',
                     locale: res.data.locale || 'en',
                     compactMode: res.data.compactMode ?? false,
                     contentLayout: res.data.contentLayout || 'grid',
                     showAnnotationsInFeed: res.data.showAnnotationsInFeed ?? true,
                     emailNotifications: res.data.emailNotifications ?? true,
-                });
+                    colorPalette: res.data.colorPalette || 'lavender',
+                    fontFamily: res.data.fontFamily || 'nunito',
+                };
+                setPreferences(prefs);
+                initialPrefsRef.current = {
+                    palette: prefs.colorPalette,
+                    font: prefs.fontFamily,
+                    theme: prefs.theme,
+                };
             }
         });
+    }, []);
+
+    // Revert live preview on unmount if not saved
+    useEffect(() => {
+        return () => {
+            if (!savedRef.current && initialPrefsRef.current) {
+                applyLivePreview(initialPrefsRef.current.palette, initialPrefsRef.current.font);
+            }
+        };
     }, []);
 
     async function handleProfileSave() {
@@ -76,8 +158,20 @@ export function SettingsForm() {
             const { data: res } = await authApi.updatePreferences(preferences);
             if (res.success && res.data) {
                 setPreferences(res.data);
-                // Apply theme immediately
                 setTheme(res.data.theme || 'system');
+                applyLivePreview(res.data.colorPalette || 'lavender', res.data.fontFamily || 'nunito');
+                savedRef.current = true;
+                initialPrefsRef.current = {
+                    palette: res.data.colorPalette || 'lavender',
+                    font: res.data.fontFamily || 'nunito',
+                    theme: res.data.theme || 'system',
+                };
+
+                // Update the user object in the store so main layout picks up new prefs
+                if (user) {
+                    setUser({ ...user, preferences: res.data });
+                }
+
                 toast.success('Preferences saved');
             } else {
                 toast.error(res.errors?.[0] || 'Failed to save preferences');
@@ -89,9 +183,57 @@ export function SettingsForm() {
         }
     }
 
+    async function handleAvatarUpload(e: React.ChangeEvent<HTMLInputElement>) {
+        const file = e.target.files?.[0];
+        if (!file) return;
+
+        if (!file.type.startsWith('image/')) {
+            toast.error('Please select an image file');
+            return;
+        }
+        if (file.size > 5 * 1024 * 1024) {
+            toast.error('Image must be under 5MB');
+            return;
+        }
+
+        setAvatarUploading(true);
+        try {
+            const updatedUser = await authApi.uploadAvatar(file);
+            if (updatedUser) {
+                setUser(updatedUser);
+                setAvatarUrl(updatedUser.avatarUrl || '');
+                toast.success('Avatar updated');
+            } else {
+                toast.error('Failed to upload avatar');
+            }
+        } catch {
+            toast.error('Failed to upload avatar');
+        } finally {
+            setAvatarUploading(false);
+            if (fileInputRef.current) fileInputRef.current.value = '';
+        }
+    }
+
     function updatePref<K extends keyof UserPreferences>(key: K, value: UserPreferences[K]) {
         setPreferences((prev) => ({ ...prev, [key]: value }));
     }
+
+    function handleThemeChange(newTheme: string) {
+        updatePref('theme', newTheme);
+        setTheme(newTheme);
+    }
+
+    function handlePaletteChange(newPalette: string) {
+        updatePref('colorPalette', newPalette);
+        applyLivePreview(newPalette, preferences.fontFamily);
+    }
+
+    function handleFontChange(newFont: string) {
+        updatePref('fontFamily', newFont);
+        applyLivePreview(preferences.colorPalette, newFont);
+    }
+
+    const isDark = currentTheme === 'dark';
 
     return (
         <div className="max-w-2xl space-y-6">
@@ -103,29 +245,41 @@ export function SettingsForm() {
                 </CardHeader>
                 <CardContent className="space-y-4">
                     <div className="flex items-center gap-4">
-                        <Avatar className="h-16 w-16">
-                            {avatarUrl && <AvatarImage src={avatarUrl} alt={displayName} />}
-                            <AvatarFallback className="text-lg">{displayName?.charAt(0)?.toUpperCase() || 'U'}</AvatarFallback>
-                        </Avatar>
+                        <button
+                            type="button"
+                            className="relative group"
+                            onClick={() => fileInputRef.current?.click()}
+                            disabled={avatarUploading}
+                        >
+                            <Avatar className="h-16 w-16">
+                                {avatarUrl && <AvatarImage src={avatarUrl} alt={displayName} />}
+                                <AvatarFallback className="text-lg">{displayName?.charAt(0)?.toUpperCase() || 'U'}</AvatarFallback>
+                            </Avatar>
+                            <div className="absolute inset-0 flex items-center justify-center rounded-full bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity">
+                                {avatarUploading ? (
+                                    <Loader2 className="size-5 text-white animate-spin" />
+                                ) : (
+                                    <Camera className="size-5 text-white" />
+                                )}
+                            </div>
+                        </button>
+                        <input
+                            ref={fileInputRef}
+                            type="file"
+                            accept="image/*"
+                            className="hidden"
+                            onChange={handleAvatarUpload}
+                        />
                         <div className="flex-1 space-y-1">
                             <p className="text-sm font-medium">{user?.email}</p>
                             <p className="text-xs text-muted-foreground">Member since {user?.createdAt ? new Date(user.createdAt).toLocaleDateString() : '...'}</p>
+                            <p className="text-xs text-muted-foreground">Click the avatar to upload a new photo</p>
                         </div>
                     </div>
                     <Separator />
                     <div className="space-y-2">
                         <Label htmlFor="displayName">Display Name</Label>
                         <Input id="displayName" value={displayName} onChange={(e) => setDisplayName(e.target.value)} placeholder="Your name" />
-                    </div>
-                    <div className="space-y-2">
-                        <Label htmlFor="avatarUrl">Avatar URL</Label>
-                        <Input
-                            id="avatarUrl"
-                            value={avatarUrl}
-                            onChange={(e) => setAvatarUrl(e.target.value)}
-                            placeholder="https://example.com/avatar.jpg"
-                        />
-                        <p className="text-xs text-muted-foreground">Enter a URL for your profile picture</p>
                     </div>
                     <Button onClick={handleProfileSave} disabled={profileLoading}>
                         {profileLoading ? 'Saving...' : 'Save Profile'}
@@ -139,24 +293,119 @@ export function SettingsForm() {
                     <CardTitle>Appearance</CardTitle>
                     <CardDescription>Customize how Forever looks and feels</CardDescription>
                 </CardHeader>
-                <CardContent className="space-y-4">
-                    <div className="flex items-center justify-between">
-                        <div className="space-y-0.5">
-                            <Label>Theme</Label>
-                            <p className="text-xs text-muted-foreground">Choose your preferred color scheme</p>
+                <CardContent className="space-y-6">
+                    {/* Theme toggle */}
+                    <div className="space-y-2">
+                        <Label>Theme</Label>
+                        <div className="flex gap-2">
+                            {THEME_OPTIONS.map(({ key, label, icon: Icon }) => (
+                                <button
+                                    key={key}
+                                    type="button"
+                                    onClick={() => handleThemeChange(key)}
+                                    className={cn(
+                                        'flex items-center gap-2 rounded-lg border px-4 py-2 text-sm font-medium transition-colors',
+                                        preferences.theme === key
+                                            ? 'border-primary bg-primary/10 text-primary'
+                                            : 'border-border hover:bg-accent',
+                                    )}
+                                >
+                                    <Icon className="size-4" />
+                                    {label}
+                                </button>
+                            ))}
                         </div>
-                        <Select value={preferences.theme} onValueChange={(v) => updatePref('theme', v)}>
-                            <SelectTrigger className="w-36">
-                                <SelectValue />
-                            </SelectTrigger>
-                            <SelectContent>
-                                <SelectItem value="system">System</SelectItem>
-                                <SelectItem value="light">Light</SelectItem>
-                                <SelectItem value="dark">Dark</SelectItem>
-                            </SelectContent>
-                        </Select>
                     </div>
+
                     <Separator />
+
+                    {/* Color Palette */}
+                    <div className="space-y-3">
+                        <Label>Color Palette</Label>
+                        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+                            {PALETTES.map((palette) => {
+                                const colors = isDark ? palette.darkColors : palette.lightColors;
+                                const isActive = preferences.colorPalette === palette.key;
+
+                                return (
+                                    <button
+                                        key={palette.key}
+                                        type="button"
+                                        onClick={() => handlePaletteChange(palette.key)}
+                                        className={cn(
+                                            'relative flex flex-col items-center gap-2 rounded-xl border-2 p-3 transition-all',
+                                            isActive
+                                                ? 'border-primary ring-2 ring-primary/20'
+                                                : 'border-border hover:border-primary/40',
+                                        )}
+                                    >
+                                        {isActive && (
+                                            <div className="absolute top-1.5 right-1.5 flex size-5 items-center justify-center rounded-full bg-primary text-primary-foreground">
+                                                <Check className="size-3" />
+                                            </div>
+                                        )}
+                                        {/* Color preview swatch */}
+                                        <div
+                                            className="flex h-10 w-full items-center justify-center gap-1 rounded-lg"
+                                            style={{ backgroundColor: colors.bg }}
+                                        >
+                                            <div
+                                                className="h-6 w-6 rounded-full"
+                                                style={{ background: `linear-gradient(135deg, ${colors.primary}, ${colors.secondary})` }}
+                                            />
+                                            <div className="h-6 w-6 rounded-full" style={{ backgroundColor: colors.primary }} />
+                                            <div className="h-6 w-6 rounded-full" style={{ backgroundColor: colors.secondary }} />
+                                        </div>
+                                        <span className="text-xs font-medium">{palette.label}</span>
+                                    </button>
+                                );
+                            })}
+                        </div>
+                    </div>
+
+                    <Separator />
+
+                    {/* Font */}
+                    <div className="space-y-3">
+                        <Label>Font</Label>
+                        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+                            {FONTS.map((font) => {
+                                const isActive = preferences.fontFamily === font.key;
+
+                                return (
+                                    <button
+                                        key={font.key}
+                                        type="button"
+                                        onClick={() => handleFontChange(font.key)}
+                                        className={cn(
+                                            'relative flex flex-col items-start gap-1 rounded-xl border-2 p-3 text-left transition-all',
+                                            isActive
+                                                ? 'border-primary ring-2 ring-primary/20'
+                                                : 'border-border hover:border-primary/40',
+                                        )}
+                                    >
+                                        {isActive && (
+                                            <div className="absolute top-1.5 right-1.5 flex size-5 items-center justify-center rounded-full bg-primary text-primary-foreground">
+                                                <Check className="size-3" />
+                                            </div>
+                                        )}
+                                        <span
+                                            className="text-lg font-semibold leading-tight"
+                                            style={{ fontFamily: `var(${font.cssVar}), sans-serif` }}
+                                        >
+                                            Aa Bb Cc
+                                        </span>
+                                        <span className="text-xs font-medium">{font.label}</span>
+                                        <span className="text-[10px] text-muted-foreground">{font.category}</span>
+                                    </button>
+                                );
+                            })}
+                        </div>
+                    </div>
+
+                    <Separator />
+
+                    {/* Content Layout + Compact Mode */}
                     <div className="flex items-center justify-between">
                         <div className="space-y-0.5">
                             <Label>Content Layout</Label>

@@ -1,8 +1,28 @@
 import api from './client';
 import type { ApiResponse, PaginatedResult } from '@/lib/types/api';
-import type { FeedItem } from '@/lib/types/feed';
+import type { FeedActivity } from '@/lib/types/feed';
 
 export const feedApi = {
-    get: (havenId: string, page = 1, pageSize = 20) =>
-        api.get<ApiResponse<PaginatedResult<FeedItem>>>(`/havens/${havenId}/feed`, { params: { page, pageSize } }),
+    getActivities: (
+        havenId: string,
+        page = 1,
+        pageSize = 20,
+        from?: string,
+        to?: string,
+        includeDismissed = false,
+    ) =>
+        api.get<ApiResponse<PaginatedResult<FeedActivity>>>(
+            `/havens/${havenId}/feed`,
+            {
+                params: { page, pageSize, from, to, includeDismissed },
+            },
+        ),
+
+    dismiss: (havenId: string, activityId: string) =>
+        api.put<ApiResponse>(`/havens/${havenId}/feed/${activityId}/dismiss`),
+
+    dismissAll: (havenId: string) =>
+        api.put<ApiResponse<{ dismissed: number }>>(
+            `/havens/${havenId}/feed/dismiss-all`,
+        ),
 };

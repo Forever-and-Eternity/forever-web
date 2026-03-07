@@ -16,7 +16,7 @@ const MIN_WIDTH = 200;
 const MAX_WIDTH = 400;
 const DEFAULT_WIDTH = 260;
 
-export function Sidebar() {
+export function Sidebar({ onNavigate }: { onNavigate?: () => void } = {}) {
     const pathname = usePathname();
     const { user, logout } = useAuthStore();
     const { havens, setHavens } = useHavenStore();
@@ -85,7 +85,7 @@ export function Sidebar() {
         <div ref={sidebarRef} className="relative flex h-full flex-col border-r bg-sidebar" style={{ width }}>
             {/* Logo */}
             <div className="flex h-14 items-center px-4">
-                <Link href="/havens" className="text-xl font-bold tracking-tight text-gradient-ig" style={{ fontFamily: 'var(--font-display-var), serif' }}>
+                <Link href="/dashboard" className="text-xl font-bold tracking-tight text-gradient-ig" style={{ fontFamily: 'var(--font-display-var), sans-serif' }}>
                     Forever
                 </Link>
             </div>
@@ -99,6 +99,7 @@ export function Sidebar() {
                         <Link
                             key={haven.id}
                             href={`/havens/${haven.id}`}
+                            onClick={onNavigate}
                             className={cn(
                                 'flex items-center gap-2 rounded-lg px-2.5 py-2 text-sm transition-colors hover:bg-accent',
                                 pathname.startsWith(`/havens/${haven.id}`) && 'bg-accent font-medium text-foreground',
@@ -112,6 +113,7 @@ export function Sidebar() {
                     ))}
                     <Link
                         href="/havens/new"
+                        onClick={onNavigate}
                         className="flex items-center gap-2 rounded-lg px-2.5 py-2 text-sm text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
                     >
                         <span className="flex h-7 w-7 items-center justify-center rounded-lg border-2 border-dashed border-muted-foreground/30 text-[14px] shrink-0">
@@ -127,6 +129,7 @@ export function Sidebar() {
             <div className="px-3 py-2">
                 <Link
                     href="/settings"
+                    onClick={onNavigate}
                     className={cn(
                         'flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-sm transition-colors hover:bg-accent',
                         pathname === '/settings' && 'bg-accent font-medium',

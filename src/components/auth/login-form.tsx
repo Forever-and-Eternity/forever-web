@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { Eye, EyeOff } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -17,6 +18,7 @@ export function LoginForm() {
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
+    const [showPassword, setShowPassword] = useState(false);
 
     async function handleSubmit(e: React.FormEvent) {
         e.preventDefault();
@@ -27,7 +29,7 @@ export function LoginForm() {
             const { data: res } = await authApi.login({ email, password });
             if (res.success && res.data) {
                 setAuth(res.data.user, res.data.accessToken, res.data.refreshToken);
-                router.push('/havens');
+                router.push('/dashboard');
             } else {
                 setError(res.errors[0] || 'Login failed');
             }
@@ -42,7 +44,7 @@ export function LoginForm() {
     return (
         <Card className="w-full max-w-md shadow-lg">
             <CardHeader className="text-center">
-                <CardTitle className="text-2xl" style={{ fontFamily: 'var(--font-display-var), serif' }}>Welcome back</CardTitle>
+                <CardTitle className="text-2xl" style={{ fontFamily: 'var(--font-display-var), sans-serif' }}>Welcome back</CardTitle>
                 <CardDescription>Sign in to your <span className="text-gradient-ig font-semibold">Forever</span> account</CardDescription>
             </CardHeader>
             <CardContent>
@@ -61,7 +63,12 @@ export function LoginForm() {
                     </div>
                     <div className="space-y-2">
                         <Label htmlFor="password">Password</Label>
-                        <Input id="password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} required />
+                        <div className="relative">
+                            <Input id="password" type={showPassword ? 'text' : 'password'} value={password} onChange={(e) => setPassword(e.target.value)} required className="pr-10" />
+                            <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors" tabIndex={-1}>
+                                {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                            </button>
+                        </div>
                     </div>
                     <Button type="submit" className="w-full bg-gradient-ig text-white hover:opacity-90 font-semibold" disabled={loading}>
                         {loading ? 'Signing in...' : 'Sign in'}

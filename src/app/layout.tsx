@@ -1,17 +1,56 @@
 import type { Metadata } from 'next';
-import { Inter, Playfair_Display, JetBrains_Mono } from 'next/font/google';
+import {
+    Nunito,
+    Plus_Jakarta_Sans,
+    Outfit,
+    DM_Sans,
+    Manrope,
+    Sora,
+    Space_Grotesk,
+    JetBrains_Mono,
+} from 'next/font/google';
 import { ThemeProvider } from 'next-themes';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import './globals.css';
 
-const inter = Inter({
-    variable: '--font-sans-var',
+const nunito = Nunito({
+    variable: '--font-nunito',
     subsets: ['latin'],
     display: 'swap',
 });
 
-const playfair = Playfair_Display({
-    variable: '--font-display-var',
+const plusJakartaSans = Plus_Jakarta_Sans({
+    variable: '--font-plus-jakarta-sans',
+    subsets: ['latin'],
+    display: 'swap',
+});
+
+const outfit = Outfit({
+    variable: '--font-outfit',
+    subsets: ['latin'],
+    display: 'swap',
+});
+
+const dmSans = DM_Sans({
+    variable: '--font-dm-sans',
+    subsets: ['latin'],
+    display: 'swap',
+});
+
+const manrope = Manrope({
+    variable: '--font-manrope',
+    subsets: ['latin'],
+    display: 'swap',
+});
+
+const sora = Sora({
+    variable: '--font-sora',
+    subsets: ['latin'],
+    display: 'swap',
+});
+
+const spaceGrotesk = Space_Grotesk({
+    variable: '--font-space-grotesk',
     subsets: ['latin'],
     display: 'swap',
 });
@@ -21,6 +60,17 @@ const jetbrainsMono = JetBrains_Mono({
     subsets: ['latin'],
     display: 'swap',
 });
+
+const fontVars = [
+    nunito.variable,
+    plusJakartaSans.variable,
+    outfit.variable,
+    dmSans.variable,
+    manrope.variable,
+    sora.variable,
+    spaceGrotesk.variable,
+    jetbrainsMono.variable,
+].join(' ');
 
 export const metadata: Metadata = {
     title: 'Forever — Preserve What Matters',
@@ -33,8 +83,8 @@ export default function RootLayout({
     children: React.ReactNode;
 }>) {
     return (
-        <html lang="en" suppressHydrationWarning>
-            <body className={`${inter.variable} ${playfair.variable} ${jetbrainsMono.variable} font-sans antialiased`}>
+        <html lang="en" suppressHydrationWarning className={fontVars} data-palette="lavender" data-font="nunito">
+            <body className="font-sans antialiased" suppressHydrationWarning>
                 <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange={false}>
                     <TooltipProvider>{children}</TooltipProvider>
                 </ThemeProvider>

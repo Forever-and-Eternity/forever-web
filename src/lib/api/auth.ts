@@ -1,3 +1,4 @@
+import axios from 'axios';
 import api from './client';
 import type { ApiResponse } from '@/lib/types/api';
 import type {
@@ -23,4 +24,22 @@ export const authApi = {
     getPreferences: () => api.get<ApiResponse<UserPreferences>>('/auth/preferences'),
 
     updatePreferences: (data: UserPreferences) => api.put<ApiResponse<UserPreferences>>('/auth/preferences', data),
+
+    getAvatarUploadUrl: (fileName: string, fileSize: number) =>
+        api.post<ApiResponse<{ presignedUrl: string; avatarKey: string }>>('/auth/avatar-upload-url', { fileName, fileSize }),
+
+    confirmAvatar: (avatarKey: string) =>
+        api.put<ApiResponse<UserProfile>>('/auth/avatar-confirm', { avatarKey }),
+
+    async uploadAvatar(file: File): Promise<UserProfile | null> {
+        const { data: urlRes } = await this.getAvatarUploadUrl(file.name, file.size);
+        if (!urlRes.success || !urlRes.data) return null;
+
+        await axios.put(urlRes.data.presignedUrl, file, {
+            headers: { 'Content-Type': file.type },
+        });
+
+        const { data: confirmRes } = await this.confirmAvatar(urlRes.data.avatarKey);
+        return confirmRes.success ? confirmRes.data ?? null : null;
+    },
 };

@@ -9,7 +9,6 @@ export default function FeedPage() {
 
     return (
         <div>
-            <h2 className="mb-6 text-2xl font-bold">Feed</h2>
             <FeedList havenId={havenId} />
         </div>
     );

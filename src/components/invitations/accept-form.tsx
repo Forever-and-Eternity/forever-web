@@ -31,7 +31,7 @@ export function AcceptForm({ token }: { token: string }) {
             });
             if (res.success && res.data) {
                 setAuth(res.data.user, res.data.accessToken, res.data.refreshToken);
-                router.push('/havens');
+                router.push('/dashboard');
             } else {
                 setError(res.errors[0] || 'Failed to accept invitation');
             }

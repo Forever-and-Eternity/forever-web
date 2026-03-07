@@ -1,0 +1,758 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Forever — Theme & Font Preview</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Outfit:wght@400;500;600;700;800&family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&family=Nunito:wght@400;500;600;700;800&family=Sora:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&family=Cormorant+Garamond:wght@400;500;600;700&family=Playfair+Display:wght@400;500;600;700;800&family=Crimson+Pro:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: #0a0a1a;
+    color: #e0e0f0;
+    font-family: system-ui, sans-serif;
+    line-height: 1.5;
+    transition: background 0.4s ease, color 0.4s ease;
+  }
+
+  .controls {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    backdrop-filter: blur(12px);
+    padding: 16px 24px;
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    align-items: center;
+    transition: background 0.3s, border-color 0.3s;
+  }
+  .controls label {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    opacity: 0.5;
+    margin-right: 4px;
+  }
+  .controls select {
+    border-radius: 8px;
+    padding: 8px 12px;
+    font-size: 13px;
+    cursor: pointer;
+    outline: none;
+    transition: all 0.3s;
+  }
+
+  /* ── Theme Toggle ── */
+  .theme-toggle {
+    display: flex;
+    border-radius: 10px;
+    overflow: hidden;
+    border: 1px solid rgba(128,128,128,0.2);
+  }
+  .theme-toggle button {
+    padding: 8px 16px;
+    font-size: 12px;
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  .container { max-width: 1100px; margin: 0 auto; padding: 32px 24px; }
+
+  h1.page-title {
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    opacity: 0.4;
+    margin-bottom: 32px;
+    text-align: center;
+  }
+
+  /* ── Palette Section ── */
+  .palette-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 24px;
+    margin-bottom: 48px;
+  }
+
+  .palette-card {
+    border-radius: 16px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+  }
+  .palette-card:hover { transform: translateY(-2px); }
+  .palette-card .badge {
+    position: absolute; top: 12px; right: 12px;
+    backdrop-filter: blur(8px);
+    padding: 4px 10px; border-radius: 20px;
+    font-size: 10px; text-transform: uppercase; letter-spacing: 1px;
+    display: none;
+  }
+  .palette-card.active .badge { display: block; }
+
+  .palette-header {
+    padding: 20px;
+    position: relative;
+  }
+  .palette-header h3 { font-size: 18px; font-weight: 700; margin-bottom: 4px; }
+  .palette-header p { font-size: 12px; opacity: 0.6; }
+
+  .palette-swatches {
+    display: flex;
+    height: 48px;
+  }
+  .palette-swatches > div { flex: 1; }
+
+  .palette-preview {
+    padding: 20px;
+  }
+  .palette-preview .btn-row { display: flex; gap: 8px; margin-bottom: 12px; }
+  .palette-preview .btn {
+    padding: 10px 20px;
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+    color: #fff;
+    transition: opacity 0.2s;
+  }
+  .palette-preview .btn:hover { opacity: 0.85; }
+  .palette-preview .btn-outline {
+    background: transparent;
+  }
+
+  .palette-preview .mini-card {
+    border-radius: 10px;
+    padding: 14px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .palette-preview .mini-card .icon-circle {
+    width: 36px; height: 36px;
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px;
+  }
+  .palette-preview .mini-card .text h4 { font-size: 13px; font-weight: 600; }
+  .palette-preview .mini-card .text p { font-size: 11px; opacity: 0.5; }
+
+  /* ── Font Section ── */
+  .section-title {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    opacity: 0.35;
+    margin-bottom: 20px;
+    padding-bottom: 8px;
+  }
+
+  .font-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 20px;
+    margin-bottom: 48px;
+  }
+
+  .font-card {
+    border-radius: 14px;
+    padding: 24px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+
+  .font-card .font-label {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    opacity: 0.35;
+    margin-bottom: 12px;
+  }
+  .font-card .font-category {
+    font-size: 9px;
+    padding: 3px 8px;
+    border-radius: 4px;
+    display: inline-block;
+    margin-left: 8px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    opacity: 0.6;
+  }
+  .font-card .font-hero {
+    font-size: 32px;
+    font-weight: 700;
+    margin-bottom: 8px;
+    line-height: 1.2;
+  }
+  .font-card .font-sample {
+    font-size: 14px;
+    font-weight: 400;
+    opacity: 0.6;
+    margin-bottom: 4px;
+  }
+  .font-card .font-chars {
+    font-size: 12px;
+    font-weight: 500;
+    opacity: 0.35;
+    letter-spacing: 2px;
+  }
+
+  /* ── Live Preview ── */
+  .live-preview {
+    border-radius: 20px;
+    overflow: hidden;
+    margin-bottom: 48px;
+    transition: all 0.3s;
+  }
+  .live-preview .preview-header {
+    padding: 16px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .live-preview .preview-header .logo {
+    font-size: 22px;
+    font-weight: 800;
+  }
+  .live-preview .preview-header .nav-items {
+    display: flex;
+    gap: 8px;
+  }
+  .live-preview .preview-header .nav-pill {
+    padding: 6px 14px;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 500;
+  }
+  .live-preview .preview-body {
+    padding: 32px 24px;
+  }
+  .live-preview .preview-body .welcome {
+    margin-bottom: 24px;
+  }
+  .live-preview .preview-body .welcome .greeting {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    opacity: 0.4;
+    font-weight: 600;
+  }
+  .live-preview .preview-body .welcome h2 {
+    font-size: 24px;
+    font-weight: 700;
+  }
+  .live-preview .preview-body .cards-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin-bottom: 20px;
+  }
+  .live-preview .preview-body .stat-card {
+    border-radius: 12px;
+    padding: 16px;
+    transition: all 0.3s;
+  }
+  .live-preview .preview-body .stat-card .stat-icon {
+    width: 32px; height: 32px;
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px;
+    margin-bottom: 10px;
+  }
+  .live-preview .preview-body .stat-card h4 { font-size: 20px; font-weight: 700; }
+  .live-preview .preview-body .stat-card p { font-size: 11px; opacity: 0.4; font-weight: 500; }
+  .live-preview .preview-body .action-btns { display: flex; gap: 10px; }
+  .live-preview .preview-body .action-btn {
+    padding: 12px 24px;
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+    color: #fff;
+  }
+  .live-preview .preview-body .action-btn.secondary {
+    border: 1px solid;
+  }
+
+  /* ── Display Font Pairings ── */
+  .pairing-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
+    margin-bottom: 48px;
+  }
+  .pairing-card {
+    border-radius: 14px;
+    padding: 24px;
+    cursor: pointer;
+    transition: all 0.3s;
+  }
+  .pairing-card .display-sample {
+    font-size: 28px;
+    font-weight: 700;
+    margin-bottom: 4px;
+    line-height: 1.2;
+  }
+  .pairing-card .body-sample {
+    font-size: 13px;
+    opacity: 0.5;
+    margin-bottom: 12px;
+  }
+  .pairing-card .pairing-label {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    opacity: 0.3;
+  }
+
+  @media (max-width: 700px) {
+    .palette-grid, .font-grid, .pairing-grid { grid-template-columns: 1fr; }
+    .live-preview .preview-body .cards-row { grid-template-columns: 1fr; }
+    .controls { flex-direction: column; align-items: flex-start; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Sticky Controls -->
+<div class="controls" id="controlsBar">
+  <div class="theme-toggle" id="themeToggle">
+    <button id="btnDark" onclick="selectMode('dark')">Dark</button>
+    <button id="btnLight" onclick="selectMode('light')">Light</button>
+  </div>
+  <div>
+    <label>Palette</label>
+    <select id="palettePicker"></select>
+  </div>
+  <div>
+    <label>Body Font</label>
+    <select id="fontPicker">
+      <option value="'Plus Jakarta Sans'">Plus Jakarta Sans</option>
+      <option value="'Outfit'">Outfit</option>
+      <option value="'DM Sans'">DM Sans</option>
+      <option value="'Manrope'">Manrope</option>
+      <option value="'Sora'">Sora</option>
+      <option value="'Space Grotesk'">Space Grotesk</option>
+      <option value="'Nunito'">Nunito</option>
+    </select>
+  </div>
+  <div>
+    <label>Display Font</label>
+    <select id="displayPicker">
+      <option value="__body__">Same as body</option>
+      <option value="'Playfair Display'">Playfair Display</option>
+      <option value="'Cormorant Garamond'">Cormorant Garamond</option>
+      <option value="'Crimson Pro'">Crimson Pro</option>
+      <option value="'Space Grotesk'">Space Grotesk</option>
+    </select>
+  </div>
+</div>
+
+<div class="container">
+
+<h1 class="page-title">Forever — Theme & Font Explorer</h1>
+
+<!-- ── PALETTES ── -->
+<div class="section-title">Color Palettes — click to apply</div>
+<div class="palette-grid" id="paletteGrid"></div>
+
+<!-- ── BODY FONTS ── -->
+<div class="section-title">Body Fonts — click to apply</div>
+<div class="font-grid" id="fontGrid"></div>
+
+<!-- ── DISPLAY FONT PAIRINGS ── -->
+<div class="section-title">Display Font Pairings — click to apply</div>
+<div class="pairing-grid" id="pairingGrid"></div>
+
+<!-- ── LIVE PREVIEW ── -->
+<div class="section-title">Live Preview</div>
+<div class="live-preview" id="livePreview">
+  <div class="preview-header">
+    <div class="logo" id="previewLogo">Forever</div>
+    <div class="nav-items">
+      <div class="nav-pill active-nav">Dashboard</div>
+      <div class="nav-pill">Havens</div>
+      <div class="nav-pill">Settings</div>
+    </div>
+  </div>
+  <div class="preview-body">
+    <div class="welcome">
+      <div class="greeting">Good evening</div>
+      <h2 id="previewWelcome">Welcome back, Alex</h2>
+    </div>
+    <div class="cards-row">
+      <div class="stat-card" id="statCard1">
+        <div class="stat-icon" id="statIcon1">📸</div>
+        <h4>247</h4>
+        <p>Photos</p>
+      </div>
+      <div class="stat-card" id="statCard2">
+        <div class="stat-icon" id="statIcon2">📝</div>
+        <h4>18</h4>
+        <p>Journal Entries</p>
+      </div>
+      <div class="stat-card" id="statCard3">
+        <div class="stat-icon" id="statIcon3">💊</div>
+        <h4>3</h4>
+        <p>Time Capsules</p>
+      </div>
+    </div>
+    <div class="action-btns">
+      <button class="action-btn" id="actionPrimary">Upload Content</button>
+      <button class="action-btn secondary" id="actionSecondary">New Haven</button>
+    </div>
+  </div>
+</div>
+
+</div>
+
+<script>
+// ── Dark palettes ──
+const darkPalettes = [
+  {
+    name: 'Lavender Dusk',
+    desc: 'Purple/lavender on deep navy — refined, modern',
+    bg: '#0d0f1e', card: '#151831', primary: '#9b7bf7', secondary: '#6c5ce7',
+    accent: '#c4b1ff', muted: '#1e2145', text: '#e8e4f0', textSub: '#9590ab',
+    border: 'rgba(255,255,255,0.08)',
+    gradient: 'linear-gradient(135deg, #9b7bf7 0%, #6c5ce7 100%)',
+  },
+  {
+    name: 'Ocean Sapphire',
+    desc: 'Cool blue on lighter navy — calming, trustworthy',
+    bg: '#0c1527', card: '#132040', primary: '#4a9eff', secondary: '#2d7dd2',
+    accent: '#7bb8ff', muted: '#1a2a4a', text: '#dce8f5', textSub: '#7e96b5',
+    border: 'rgba(255,255,255,0.08)',
+    gradient: 'linear-gradient(135deg, #4a9eff 0%, #2d7dd2 100%)',
+  },
+  {
+    name: 'Rose Gold',
+    desc: 'Warm rose/copper on dark navy — elegant, premium',
+    bg: '#0e0f1c', card: '#181a30', primary: '#e8a87c', secondary: '#d4768b',
+    accent: '#f0c8a8', muted: '#1f1e35', text: '#f0e6e0', textSub: '#a89890',
+    border: 'rgba(255,255,255,0.08)',
+    gradient: 'linear-gradient(135deg, #e8a87c 0%, #d4768b 100%)',
+  },
+  {
+    name: 'Emerald Night',
+    desc: 'Teal/emerald on charcoal — fresh, nature-inspired',
+    bg: '#0b1219', card: '#121e28', primary: '#4ecdc4', secondary: '#2d9f97',
+    accent: '#88e0d9', muted: '#162430', text: '#daf0ec', textSub: '#7aada5',
+    border: 'rgba(255,255,255,0.08)',
+    gradient: 'linear-gradient(135deg, #4ecdc4 0%, #2d9f97 100%)',
+  },
+  {
+    name: 'Amber Flame',
+    desc: 'Warm amber/gold on deep navy — bold, energetic',
+    bg: '#0d0e1a', card: '#171930', primary: '#f5a623', secondary: '#e07c24',
+    accent: '#ffd280', muted: '#1e1e38', text: '#f5eee0', textSub: '#a89878',
+    border: 'rgba(255,255,255,0.08)',
+    gradient: 'linear-gradient(135deg, #f5a623 0%, #e07c24 100%)',
+  },
+];
+
+// ── Light palettes (off-white, warm/cool tones) ──
+const lightPalettes = [
+  {
+    name: 'Lavender Mist',
+    desc: 'Soft lavender primary on warm off-white — gentle, dreamy',
+    bg: '#f5f3f8', card: '#ffffff', primary: '#7c5cbf', secondary: '#5a3ea8',
+    accent: '#e8dff5', muted: '#edeaf2', text: '#1e1a2e', textSub: '#6b6580',
+    border: 'rgba(0,0,0,0.08)',
+    gradient: 'linear-gradient(135deg, #7c5cbf 0%, #5a3ea8 100%)',
+  },
+  {
+    name: 'Sky Breeze',
+    desc: 'Clean blue on cool off-white — fresh, professional',
+    bg: '#f2f5f9', card: '#ffffff', primary: '#3b82f6', secondary: '#2563eb',
+    accent: '#dbeafe', muted: '#e8edf4', text: '#0f172a', textSub: '#64748b',
+    border: 'rgba(0,0,0,0.07)',
+    gradient: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)',
+  },
+  {
+    name: 'Blush Cream',
+    desc: 'Warm rose on creamy off-white — soft, elegant',
+    bg: '#faf6f4', card: '#ffffff', primary: '#c2665a', secondary: '#a84e6a',
+    accent: '#f5e0db', muted: '#f0eae7', text: '#2a1c1a', textSub: '#8a7068',
+    border: 'rgba(0,0,0,0.07)',
+    gradient: 'linear-gradient(135deg, #c2665a 0%, #a84e6a 100%)',
+  },
+  {
+    name: 'Sage Garden',
+    desc: 'Earthy teal on warm stone — natural, calming',
+    bg: '#f3f6f4', card: '#ffffff', primary: '#3a9e8f', secondary: '#2d7a6e',
+    accent: '#d4ece7', muted: '#e6eeea', text: '#152420', textSub: '#5a7a70',
+    border: 'rgba(0,0,0,0.07)',
+    gradient: 'linear-gradient(135deg, #3a9e8f 0%, #2d7a6e 100%)',
+  },
+  {
+    name: 'Honey Warm',
+    desc: 'Warm amber on vanilla off-white — inviting, cozy',
+    bg: '#f9f6f1', card: '#ffffff', primary: '#c88520', secondary: '#a86820',
+    accent: '#f5e6cc', muted: '#f0ebe2', text: '#1e1a10', textSub: '#8a7a58',
+    border: 'rgba(0,0,0,0.07)',
+    gradient: 'linear-gradient(135deg, #c88520 0%, #a86820 100%)',
+  },
+];
+
+const fonts = [
+  { name: 'Plus Jakarta Sans', family: "'Plus Jakarta Sans'", category: 'Geometric', desc: 'Modern, clean, tech-forward' },
+  { name: 'Outfit', family: "'Outfit'", category: 'Geometric', desc: 'Rounded geometric, friendly but sharp' },
+  { name: 'DM Sans', family: "'DM Sans'", category: 'Neutral', desc: 'Slightly warmer Inter alternative' },
+  { name: 'Manrope', family: "'Manrope'", category: 'Neutral', desc: 'Semi-rounded, extremely readable' },
+  { name: 'Sora', family: "'Sora'", category: 'Modern', desc: 'Designed for screens, wide apertures' },
+  { name: 'Space Grotesk', family: "'Space Grotesk'", category: 'Sharp', desc: 'Distinctive, slightly retro-modern' },
+  { name: 'Nunito', family: "'Nunito'", category: 'Rounded', desc: 'Soft and approachable, very rounded' },
+];
+
+const displayFonts = [
+  { name: 'Same as body', family: null },
+  { name: 'Playfair Display', family: "'Playfair Display', serif" },
+  { name: 'Cormorant Garamond', family: "'Cormorant Garamond', serif" },
+  { name: 'Crimson Pro', family: "'Crimson Pro', serif" },
+  { name: 'Space Grotesk', family: "'Space Grotesk', sans-serif" },
+];
+
+let mode = 'dark'; // 'dark' | 'light'
+let activePalette = 0;
+let activeFont = 0;
+let activeDisplay = 0;
+
+function getPalettes() { return mode === 'dark' ? darkPalettes : lightPalettes; }
+function getP() { return getPalettes()[activePalette]; }
+
+function updatePaletteDropdown() {
+  const sel = document.getElementById('palettePicker');
+  sel.innerHTML = getPalettes().map((p, i) => `<option value="${i}">${p.name}</option>`).join('');
+  sel.value = activePalette;
+}
+
+function renderPalettes() {
+  const palettes = getPalettes();
+  const isDark = mode === 'dark';
+  const grid = document.getElementById('paletteGrid');
+  grid.innerHTML = palettes.map((p, i) => `
+    <div class="palette-card ${i === activePalette ? 'active' : ''}" onclick="selectPalette(${i})"
+         style="border: 1px solid ${i === activePalette ? p.primary + '60' : p.border}; ${i === activePalette ? 'box-shadow: 0 0 0 2px ' + p.primary + '25;' : ''}">
+      <div class="badge" style="background: ${isDark ? 'rgba(0,0,0,0.5)' : 'rgba(255,255,255,0.8)'}; color: ${p.primary};">Active</div>
+      <div class="palette-header" style="background: ${p.card};">
+        <h3 style="color: ${p.text}">${p.name}</h3>
+        <p style="color: ${p.textSub}">${p.desc}</p>
+      </div>
+      <div class="palette-swatches">
+        <div style="background: ${p.bg}" title="Background"></div>
+        <div style="background: ${p.card}" title="Card"></div>
+        <div style="background: ${p.primary}" title="Primary"></div>
+        <div style="background: ${p.secondary}" title="Secondary"></div>
+        <div style="background: ${p.accent}" title="Accent"></div>
+        <div style="background: ${p.muted}" title="Muted"></div>
+      </div>
+      <div class="palette-preview" style="background: ${p.bg};">
+        <div class="btn-row">
+          <button class="btn" style="background: ${p.gradient}; color: #fff;">Get Started</button>
+          <button class="btn btn-outline" style="border: 1px solid ${p.border}; color: ${p.textSub};">Learn More</button>
+        </div>
+        <div class="mini-card" style="background: ${p.card}; border: 1px solid ${p.border};">
+          <div class="icon-circle" style="background: ${p.primary}18; color: ${p.primary}">📸</div>
+          <div class="text">
+            <h4 style="color: ${p.text}">Family Haven</h4>
+            <p style="color: ${p.textSub}">3 members · 42 photos</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function renderFonts() {
+  const p = getP();
+  const grid = document.getElementById('fontGrid');
+  grid.innerHTML = fonts.map((f, i) => `
+    <div class="font-card ${i === activeFont ? 'active' : ''}" onclick="selectFont(${i})"
+         style="background: ${p.card}; border: 1px solid ${i === activeFont ? p.primary + '50' : p.border}; color: ${p.text};">
+      <div class="font-label" style="color: ${p.textSub}">${f.name} <span class="font-category" style="background: ${p.muted}; color: ${p.textSub};">${f.category}</span></div>
+      <div class="font-hero" style="font-family: ${f.family}, sans-serif;">Forever</div>
+      <div class="font-sample" style="font-family: ${f.family}, sans-serif; color: ${p.textSub};">${f.desc}</div>
+      <div class="font-chars" style="font-family: ${f.family}, sans-serif; color: ${p.textSub};">AaBbCc 0123456789</div>
+    </div>
+  `).join('');
+}
+
+function renderPairings() {
+  const p = getP();
+  const bodyFamily = fonts[activeFont].family;
+  const grid = document.getElementById('pairingGrid');
+  grid.innerHTML = displayFonts.map((d, i) => {
+    const dispFam = d.family || bodyFamily;
+    return `
+      <div class="pairing-card ${i === activeDisplay ? 'active' : ''}" onclick="selectDisplay(${i})"
+           style="background: ${p.card}; border: 1px solid ${i === activeDisplay ? p.primary + '50' : p.border}; color: ${p.text};">
+        <div class="display-sample" style="font-family: ${dispFam};">Welcome back</div>
+        <div class="body-sample" style="font-family: ${bodyFamily}, sans-serif; color: ${p.textSub};">Preserve what matters most — photos, stories, and memories for the people you love.</div>
+        <div class="pairing-label" style="color: ${p.textSub};">${d.name}${d.family ? ' + ' + fonts[activeFont].name : ''}</div>
+      </div>
+    `;
+  }).join('');
+}
+
+function updatePreview() {
+  const p = getP();
+  const isDark = mode === 'dark';
+  const bodyFamily = fonts[activeFont].family + ', sans-serif';
+  const dispFamily = displayFonts[activeDisplay].family || bodyFamily;
+
+  // Page background
+  document.body.style.background = p.bg;
+  document.body.style.color = p.text;
+  document.body.style.fontFamily = bodyFamily;
+
+  // Controls bar
+  const controls = document.getElementById('controlsBar');
+  controls.style.background = isDark ? p.bg + 'ee' : p.bg + 'ee';
+  controls.style.borderBottom = '1px solid ' + p.border;
+  document.querySelectorAll('.controls select').forEach(el => {
+    el.style.background = p.muted;
+    el.style.color = p.text;
+    el.style.border = '1px solid ' + p.border;
+  });
+
+  // Theme toggle
+  const btnDark = document.getElementById('btnDark');
+  const btnLight = document.getElementById('btnLight');
+  btnDark.style.background = isDark ? p.primary : 'transparent';
+  btnDark.style.color = isDark ? '#fff' : p.textSub;
+  btnLight.style.background = !isDark ? p.primary : 'transparent';
+  btnLight.style.color = !isDark ? '#fff' : p.textSub;
+
+  // Live preview
+  const preview = document.getElementById('livePreview');
+  preview.style.background = p.bg;
+  preview.style.border = '1px solid ' + p.border;
+
+  const header = document.querySelector('.preview-header');
+  header.style.background = p.card;
+  header.style.borderBottom = '1px solid ' + p.border;
+
+  const logo = document.getElementById('previewLogo');
+  logo.style.background = p.gradient;
+  logo.style.webkitBackgroundClip = 'text';
+  logo.style.webkitTextFillColor = 'transparent';
+  logo.style.fontFamily = dispFamily;
+
+  document.getElementById('previewWelcome').style.fontFamily = dispFamily;
+
+  const activeNavPill = document.querySelector('.nav-pill.active-nav');
+  activeNavPill.style.background = p.primary + '20';
+  activeNavPill.style.color = p.primary;
+
+  document.querySelectorAll('.nav-pill').forEach(el => {
+    el.style.fontFamily = bodyFamily;
+    if (!el.classList.contains('active-nav')) {
+      el.style.background = p.muted;
+      el.style.color = p.textSub;
+    }
+  });
+
+  document.querySelector('.preview-body').style.background = p.bg;
+  document.querySelector('.greeting').style.fontFamily = bodyFamily;
+  document.querySelector('.greeting').style.color = p.textSub;
+
+  document.querySelectorAll('.stat-card').forEach(el => {
+    el.style.background = p.card;
+    el.style.border = '1px solid ' + p.border;
+    el.style.fontFamily = bodyFamily;
+    el.style.color = p.text;
+  });
+  document.querySelectorAll('.stat-card p').forEach(el => { el.style.color = p.textSub; });
+
+  ['statIcon1', 'statIcon2', 'statIcon3'].forEach(id => {
+    document.getElementById(id).style.background = p.primary + '18';
+  });
+
+  const primaryBtn = document.getElementById('actionPrimary');
+  primaryBtn.style.background = p.gradient;
+  primaryBtn.style.fontFamily = bodyFamily;
+  primaryBtn.style.color = '#fff';
+
+  const secondaryBtn = document.getElementById('actionSecondary');
+  secondaryBtn.style.background = isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.04)';
+  secondaryBtn.style.borderColor = p.border;
+  secondaryBtn.style.color = p.textSub;
+  secondaryBtn.style.fontFamily = bodyFamily;
+
+  // Section titles
+  document.querySelectorAll('.section-title').forEach(el => {
+    el.style.color = p.textSub;
+    el.style.borderColor = p.border;
+  });
+  document.querySelector('.page-title').style.color = p.textSub;
+
+  // Dropdown sync
+  document.getElementById('palettePicker').value = activePalette;
+  document.getElementById('fontPicker').value = fonts[activeFont].family;
+  document.getElementById('displayPicker').value = displayFonts[activeDisplay].family ? displayFonts[activeDisplay].family : '__body__';
+}
+
+function renderAll() {
+  updatePaletteDropdown();
+  renderPalettes();
+  renderFonts();
+  renderPairings();
+  updatePreview();
+}
+
+function selectMode(m) {
+  mode = m;
+  activePalette = 0;
+  renderAll();
+}
+
+function selectPalette(i) {
+  activePalette = i;
+  renderAll();
+}
+
+function selectFont(i) {
+  activeFont = i;
+  renderFonts();
+  renderPairings();
+  updatePreview();
+}
+
+function selectDisplay(i) {
+  activeDisplay = i;
+  renderPairings();
+  updatePreview();
+}
+
+// Sticky control handlers
+document.getElementById('palettePicker').addEventListener('change', e => selectPalette(+e.target.value));
+document.getElementById('fontPicker').addEventListener('change', e => {
+  const idx = fonts.findIndex(f => f.family === e.target.value);
+  if (idx >= 0) selectFont(idx);
+});
+document.getElementById('displayPicker').addEventListener('change', e => {
+  const val = e.target.value;
+  if (val === '__body__') { selectDisplay(0); return; }
+  const idx = displayFonts.findIndex(d => d.family === val);
+  if (idx >= 0) selectDisplay(idx);
+});
+
+// Init
+renderAll();
+</script>
+
+</body>
+</html>

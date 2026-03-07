@@ -18,6 +18,8 @@ const mockUser: UserProfile = {
         contentLayout: 'grid',
         showAnnotationsInFeed: true,
         emailNotifications: true,
+        colorPalette: 'lavender',
+        fontFamily: 'nunito',
     },
 };
 

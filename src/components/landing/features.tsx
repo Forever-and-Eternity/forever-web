@@ -35,7 +35,7 @@ export function Features() {
     return (
         <section className="bg-muted/30 px-4 py-24">
             <div className="mx-auto max-w-5xl">
-                <h2 className="mb-4 text-center text-3xl font-bold" style={{ fontFamily: 'var(--font-display-var), serif' }}>
+                <h2 className="mb-4 text-center text-3xl font-bold" style={{ fontFamily: 'var(--font-display-var), sans-serif' }}>
                     Everything you need to preserve memories
                 </h2>
                 <p className="mb-12 text-center text-muted-foreground max-w-2xl mx-auto">

@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 export function Hero() {
     return (
         <section className="flex flex-col items-center justify-center px-4 py-28 text-center animate-fade-in">
-            <h1 className="text-5xl font-bold tracking-tight sm:text-7xl" style={{ fontFamily: 'var(--font-display-var), serif' }}>
+            <h1 className="text-5xl font-bold tracking-tight sm:text-7xl" style={{ fontFamily: 'var(--font-display-var), sans-serif' }}>
                 Preserve What Matters
                 <span className="block text-gradient-ig mt-2">Forever</span>
             </h1>

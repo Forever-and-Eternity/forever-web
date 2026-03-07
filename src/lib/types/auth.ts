@@ -21,6 +21,8 @@ export interface UserPreferences {
     contentLayout: string;
     showAnnotationsInFeed: boolean;
     emailNotifications: boolean;
+    colorPalette: string;
+    fontFamily: string;
 }
 
 export interface UpdateProfileRequest {
