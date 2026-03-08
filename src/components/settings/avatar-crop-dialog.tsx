@@ -15,21 +15,26 @@ import {
 import { Button } from '@/components/ui/button';
 import { Slider } from '@/components/ui/slider';
 
-interface AvatarCropDialogProps {
+export interface ImageCropDialogProps {
     open: boolean;
     imageFile: File | null;
     onCropComplete: (blob: Blob) => void;
     onCancel: () => void;
+    title?: string;
+    cropShape?: 'round' | 'rect';
+    aspect?: number;
+    outputWidth?: number;
+    outputHeight?: number;
 }
 
-function getCroppedImage(imageSrc: string, pixelCrop: Area): Promise<Blob> {
+function getCroppedImage(imageSrc: string, pixelCrop: Area, outputWidth: number, outputHeight: number): Promise<Blob> {
     return new Promise((resolve, reject) => {
         const image = new Image();
         image.crossOrigin = 'anonymous';
         image.onload = () => {
             const canvas = document.createElement('canvas');
-            canvas.width = 512;
-            canvas.height = 512;
+            canvas.width = outputWidth;
+            canvas.height = outputHeight;
             const ctx = canvas.getContext('2d');
             if (!ctx) {
                 reject(new Error('Failed to get canvas context'));
@@ -43,8 +48,8 @@ function getCroppedImage(imageSrc: string, pixelCrop: Area): Promise<Blob> {
                 pixelCrop.height,
                 0,
                 0,
-                512,
-                512,
+                outputWidth,
+                outputHeight,
             );
             canvas.toBlob(
                 (blob) => {
@@ -60,7 +65,17 @@ function getCroppedImage(imageSrc: string, pixelCrop: Area): Promise<Blob> {
     });
 }
 
-export function AvatarCropDialog({ open, imageFile, onCropComplete, onCancel }: AvatarCropDialogProps) {
+export function ImageCropDialog({
+    open,
+    imageFile,
+    onCropComplete,
+    onCancel,
+    title = 'Crop Image',
+    cropShape = 'rect',
+    aspect = 1,
+    outputWidth = 512,
+    outputHeight = 512,
+}: ImageCropDialogProps) {
     const [imageSrc, setImageSrc] = useState<string | null>(null);
     const [crop, setCrop] = useState({ x: 0, y: 0 });
     const [zoom, setZoom] = useState(1);
@@ -95,7 +110,7 @@ export function AvatarCropDialog({ open, imageFile, onCropComplete, onCancel }: 
         if (!imageSrc || !croppedAreaPixels) return;
         setSaving(true);
         try {
-            const blob = await getCroppedImage(imageSrc, croppedAreaPixels);
+            const blob = await getCroppedImage(imageSrc, croppedAreaPixels, outputWidth, outputHeight);
             onCropComplete(blob);
         } catch {
             setSaving(false);
@@ -106,7 +121,7 @@ export function AvatarCropDialog({ open, imageFile, onCropComplete, onCancel }: 
         <Dialog open={open} onOpenChange={(isOpen) => { if (!isOpen) onCancel(); }}>
             <DialogContent className="sm:max-w-md">
                 <DialogHeader>
-                    <DialogTitle>Crop Avatar</DialogTitle>
+                    <DialogTitle>{title}</DialogTitle>
                     <DialogDescription>Drag to reposition and use the slider to zoom.</DialogDescription>
                 </DialogHeader>
 
@@ -116,8 +131,8 @@ export function AvatarCropDialog({ open, imageFile, onCropComplete, onCancel }: 
                             image={imageSrc}
                             crop={crop}
                             zoom={zoom}
-                            aspect={1}
-                            cropShape="round"
+                            aspect={aspect}
+                            cropShape={cropShape}
                             showGrid={false}
                             onCropChange={setCrop}
                             onZoomChange={setZoom}
@@ -154,5 +169,19 @@ export function AvatarCropDialog({ open, imageFile, onCropComplete, onCancel }: 
                 </DialogFooter>
             </DialogContent>
         </Dialog>
+    );
+}
+
+/** Convenience wrapper for avatar cropping (round, 1:1, 512x512). */
+export function AvatarCropDialog(props: Omit<ImageCropDialogProps, 'title' | 'cropShape' | 'aspect' | 'outputWidth' | 'outputHeight'>) {
+    return (
+        <ImageCropDialog
+            {...props}
+            title="Crop Avatar"
+            cropShape="round"
+            aspect={1}
+            outputWidth={512}
+            outputHeight={512}
+        />
     );
 }

@@ -2,11 +2,13 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { useTheme } from 'next-themes';
 import { Sidebar } from '@/components/layout/sidebar';
 import { Header } from '@/components/layout/header';
 import { MobileNav } from '@/components/layout/mobile-nav';
 import { useAuthStore } from '@/lib/stores/auth-store';
 import { useUiStore } from '@/lib/stores/ui-store';
+import { authApi } from '@/lib/api/auth';
 import { cn } from '@/lib/utils';
 import { Toaster } from '@/components/ui/sonner';
 
@@ -18,7 +20,8 @@ function applyAppearancePreferences(palette?: string, font?: string) {
 
 export default function MainLayout({ children }: { children: React.ReactNode }) {
     const router = useRouter();
-    const { hydrate, isAuthenticated, user } = useAuthStore();
+    const { setTheme } = useTheme();
+    const { hydrate, isAuthenticated, user, setUser } = useAuthStore();
     const sidebarOpen = useUiStore((s) => s.sidebarOpen);
     const [ready, setReady] = useState(false);
 
@@ -27,7 +30,23 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
         setReady(true);
     }, [hydrate]);
 
-    // Apply stored palette + font preferences on hydration
+    // Fetch preferences from the API so they persist across browsers
+    useEffect(() => {
+        if (ready && isAuthenticated) {
+            authApi.getPreferences().then(({ data: res }) => {
+                if (res.success && res.data) {
+                    applyAppearancePreferences(res.data.colorPalette, res.data.fontFamily);
+                    setTheme(res.data.theme || 'system');
+                    if (user) {
+                        setUser({ ...user, preferences: res.data });
+                    }
+                }
+            }).catch(() => {});
+        }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [ready, isAuthenticated]);
+
+    // Also apply immediately from cached user for fast paint
     useEffect(() => {
         if (ready && user?.preferences) {
             applyAppearancePreferences(

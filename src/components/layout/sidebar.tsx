@@ -20,7 +20,6 @@ export function Sidebar({ onNavigate }: { onNavigate?: () => void } = {}) {
     const pathname = usePathname();
     const { user, logout } = useAuthStore();
     const { havens, setHavens } = useHavenStore();
-    const [loaded, setLoaded] = useState(false);
     const [width, setWidth] = useState(DEFAULT_WIDTH);
     const isResizing = useRef(false);
     const sidebarRef = useRef<HTMLDivElement>(null);
@@ -35,18 +34,18 @@ export function Sidebar({ onNavigate }: { onNavigate?: () => void } = {}) {
         }
     }, []);
 
+    // Only fetch if the store is empty (avoids duplicating the fetch from havens page)
     useEffect(() => {
-        if (!loaded) {
+        if (havens.length === 0) {
             havensApi
                 .list(1, 100)
                 .then(({ data: res }) => {
                     if (res.success && res.data) {
                         setHavens(res.data.items);
                     }
-                })
-                .finally(() => setLoaded(true));
+                });
         }
-    }, [loaded, setHavens]);
+    }, [havens.length, setHavens]);
 
     const handleMouseDown = useCallback((e: React.MouseEvent) => {
         e.preventDefault();
@@ -82,10 +81,10 @@ export function Sidebar({ onNavigate }: { onNavigate?: () => void } = {}) {
     }
 
     return (
-        <div ref={sidebarRef} className="relative flex h-full flex-col border-r bg-sidebar" style={{ width }}>
+        <div ref={sidebarRef} className="relative flex h-full flex-col border-r bg-sidebar" style={onNavigate ? undefined : { width }}>
             {/* Logo */}
             <div className="flex h-14 items-center px-4">
-                <Link href="/dashboard" className="text-xl font-bold tracking-tight text-gradient-ig" style={{ fontFamily: 'var(--font-display-var), sans-serif' }}>
+                <Link href="/dashboard" onClick={onNavigate} className="text-xl font-bold tracking-tight text-gradient-ig" style={{ fontFamily: 'var(--font-display-var), sans-serif' }}>
                     Forever
                 </Link>
             </div>
@@ -101,7 +100,7 @@ export function Sidebar({ onNavigate }: { onNavigate?: () => void } = {}) {
                             href={`/havens/${haven.id}`}
                             onClick={onNavigate}
                             className={cn(
-                                'flex items-center gap-2 rounded-lg px-2.5 py-2 text-sm transition-colors hover:bg-accent',
+                                'flex items-center gap-2 rounded-lg px-2.5 py-2 text-sm transition-colors hover:bg-accent min-w-0',
                                 pathname.startsWith(`/havens/${haven.id}`) && 'bg-accent font-medium text-foreground',
                             )}
                         >
@@ -158,8 +157,8 @@ export function Sidebar({ onNavigate }: { onNavigate?: () => void } = {}) {
                 </Button>
             </div>
 
-            {/* Resize handle */}
-            <div className="sidebar-resize-handle" onMouseDown={handleMouseDown} />
+            {/* Resize handle (desktop only) */}
+            {!onNavigate && <div className="sidebar-resize-handle" onMouseDown={handleMouseDown} />}
         </div>
     );
 }

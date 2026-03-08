@@ -14,9 +14,9 @@ export function MobileNav() {
 
     return (
         <Sheet open={!sidebarOpen} onOpenChange={(open) => setSidebarOpen(!open)}>
-            <SheetContent side="left" className="w-[260px] p-0" showCloseButton={false}>
+            <SheetContent side="left" className="w-[300px] p-0" showCloseButton={false}>
                 <SheetTitle className="sr-only">Navigation</SheetTitle>
-                <SheetClose className="absolute right-4 top-0 h-14 flex items-center opacity-70 hover:opacity-100 transition-opacity z-10">
+                <SheetClose className="absolute right-3 top-0 h-14 flex items-center opacity-70 hover:opacity-100 transition-opacity z-10">
                     <XIcon className="size-4" />
                     <span className="sr-only">Close</span>
                 </SheetClose>

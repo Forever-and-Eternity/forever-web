@@ -8,9 +8,9 @@ import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useAuthStore } from '@/lib/stores/auth-store';
+import { useHavenStore } from '@/lib/stores/haven-store';
 import { havensApi } from '@/lib/api/havens';
 import { cn } from '@/lib/utils';
-import type { Haven } from '@/lib/types/haven';
 import {
     Plus,
     Upload,
@@ -33,20 +33,20 @@ function getGreeting(): string {
 export default function DashboardPage() {
     const router = useRouter();
     const user = useAuthStore((s) => s.user);
-    const [havens, setHavens] = useState<Haven[]>([]);
+    const { havens, setHavens } = useHavenStore();
     const [loading, setLoading] = useState(true);
     const [showQuickActions, setShowQuickActions] = useState(false);
 
     useEffect(() => {
         havensApi
-            .list(1, 50)
+            .list(1, 100)
             .then(({ data: res }) => {
                 if (res.success && res.data) {
                     setHavens(res.data.items);
                 }
             })
             .finally(() => setLoading(false));
-    }, []);
+    }, [setHavens]);
 
     return (
         <div className="space-y-6 max-w-5xl mx-auto pb-20">
@@ -101,22 +101,24 @@ export default function DashboardPage() {
                 </div>
                 <div className="flex gap-3 overflow-x-auto pb-2 -mx-1 px-1 snap-x">
                     {/* Placeholder capsule cards */}
-                    <Card className="min-w-[200px] sm:min-w-[220px] flex-shrink-0 snap-start border-primary/20">
-                        <CardContent className="py-4 space-y-3">
-                            <div className="flex items-center gap-3">
-                                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
-                                    <Lock className="h-5 w-5 text-primary" />
+                    <Link href={havens.length > 0 ? `/havens/${havens[0].id}/capsules/new` : '/havens/new'}>
+                        <Card className="min-w-[200px] sm:min-w-[220px] flex-shrink-0 snap-start border-primary/20 hover:border-primary/40 transition-colors cursor-pointer">
+                            <CardContent className="py-4 space-y-3">
+                                <div className="flex items-center gap-3">
+                                    <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
+                                        <Lock className="h-5 w-5 text-primary" />
+                                    </div>
+                                    <div className="min-w-0">
+                                        <p className="font-medium text-sm truncate">No capsules yet</p>
+                                        <p className="text-xs text-muted-foreground">Create your first</p>
+                                    </div>
                                 </div>
-                                <div className="min-w-0">
-                                    <p className="font-medium text-sm truncate">No capsules yet</p>
-                                    <p className="text-xs text-muted-foreground">Create your first</p>
+                                <div className="rounded-md bg-primary/10 px-3 py-1.5 text-center">
+                                    <span className="text-xs font-medium text-primary">Get Started</span>
                                 </div>
-                            </div>
-                            <div className="rounded-md bg-primary/10 px-3 py-1.5 text-center">
-                                <span className="text-xs font-medium text-primary">Get Started</span>
-                            </div>
-                        </CardContent>
-                    </Card>
+                            </CardContent>
+                        </Card>
+                    </Link>
                 </div>
             </div>
 

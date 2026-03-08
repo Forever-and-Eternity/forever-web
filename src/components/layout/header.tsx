@@ -5,7 +5,6 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { Bell, ChevronLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { ThemeToggle } from '@/components/layout/theme-toggle';
 import { useUiStore } from '@/lib/stores/ui-store';
 import { useHavenStore } from '@/lib/stores/haven-store';
 import { notificationsApi } from '@/lib/api/notifications';
@@ -170,7 +169,6 @@ export function Header() {
                     )}
                 </Button>
             </Link>
-            <ThemeToggle />
         </header>
     );
 }
