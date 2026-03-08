@@ -76,8 +76,8 @@ export default function DashboardPage() {
                 <h2 className="text-xs font-bold uppercase tracking-widest text-primary mb-3">
                     On This Day
                 </h2>
-                <Card className="overflow-hidden">
-                    <div className="relative h-48 sm:h-56 bg-gradient-to-br from-primary/20 via-accent/30 to-primary/10 flex items-center justify-center">
+                <Card className="py-0 overflow-hidden">
+                    <div className="relative py-10 sm:py-14 bg-gradient-to-br from-primary/20 via-accent/30 to-primary/10 flex items-center justify-center">
                         <div className="text-center px-6">
                             <CalendarDays className="h-10 w-10 mx-auto text-primary/50 mb-3" />
                             <p className="text-sm text-muted-foreground">
@@ -235,13 +235,13 @@ export default function DashboardPage() {
                         <Button
                             size="sm"
                             variant="secondary"
-                            className="shadow-lg rounded-full px-4"
+                            className="group shadow-lg rounded-full px-4"
                             onClick={() => {
                                 router.push('/havens/new');
                                 setShowQuickActions(false);
                             }}
                         >
-                            <Plus className="h-4 w-4 mr-2" />
+                            <Plus className="h-4 w-4 mr-2 transition-transform duration-300 ease-in-out group-hover:rotate-90" />
                             New Haven
                         </Button>
                     </div>

@@ -16,6 +16,7 @@ import { useAuthStore } from '@/lib/stores/auth-store';
 import type { UserPreferences } from '@/lib/types/auth';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
+import { AvatarCropDialog } from '@/components/settings/avatar-crop-dialog';
 
 /* ─── Palette config ─── */
 const PALETTES = [
@@ -80,6 +81,8 @@ export function SettingsForm() {
     const [loading, setLoading] = useState(false);
     const [profileLoading, setProfileLoading] = useState(false);
     const [avatarUploading, setAvatarUploading] = useState(false);
+    const [cropFile, setCropFile] = useState<File | null>(null);
+    const [cropDialogOpen, setCropDialogOpen] = useState(false);
     const fileInputRef = useRef<HTMLInputElement>(null);
     const savedRef = useRef(false);
     const initialPrefsRef = useRef<{ palette: string; font: string; theme: string } | null>(null);
@@ -183,21 +186,32 @@ export function SettingsForm() {
         }
     }
 
-    async function handleAvatarUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    function handleFileSelected(e: React.ChangeEvent<HTMLInputElement>) {
         const file = e.target.files?.[0];
         if (!file) return;
 
         if (!file.type.startsWith('image/')) {
             toast.error('Please select an image file');
+            if (fileInputRef.current) fileInputRef.current.value = '';
             return;
         }
         if (file.size > 5 * 1024 * 1024) {
             toast.error('Image must be under 5MB');
+            if (fileInputRef.current) fileInputRef.current.value = '';
             return;
         }
 
+        setCropFile(file);
+        setCropDialogOpen(true);
+        if (fileInputRef.current) fileInputRef.current.value = '';
+    }
+
+    async function handleCropComplete(blob: Blob) {
+        setCropDialogOpen(false);
+        setCropFile(null);
         setAvatarUploading(true);
         try {
+            const file = new File([blob], 'avatar.jpg', { type: 'image/jpeg' });
             const updatedUser = await authApi.uploadAvatar(file);
             if (updatedUser) {
                 setUser(updatedUser);
@@ -210,8 +224,12 @@ export function SettingsForm() {
             toast.error('Failed to upload avatar');
         } finally {
             setAvatarUploading(false);
-            if (fileInputRef.current) fileInputRef.current.value = '';
         }
+    }
+
+    function handleCropCancel() {
+        setCropDialogOpen(false);
+        setCropFile(null);
     }
 
     function updatePref<K extends keyof UserPreferences>(key: K, value: UserPreferences[K]) {
@@ -268,7 +286,7 @@ export function SettingsForm() {
                             type="file"
                             accept="image/*"
                             className="hidden"
-                            onChange={handleAvatarUpload}
+                            onChange={handleFileSelected}
                         />
                         <div className="flex-1 space-y-1">
                             <p className="text-sm font-medium">{user?.email}</p>
@@ -471,6 +489,13 @@ export function SettingsForm() {
                     {loading ? 'Saving...' : 'Save Preferences'}
                 </Button>
             </div>
+
+            <AvatarCropDialog
+                open={cropDialogOpen}
+                imageFile={cropFile}
+                onCropComplete={handleCropComplete}
+                onCancel={handleCropCancel}
+            />
         </div>
     );
 }

@@ -114,9 +114,9 @@ export function Sidebar({ onNavigate }: { onNavigate?: () => void } = {}) {
                     <Link
                         href="/havens/new"
                         onClick={onNavigate}
-                        className="flex items-center gap-2 rounded-lg px-2.5 py-2 text-sm text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
+                        className="group flex items-center gap-2 rounded-lg px-2.5 py-2 text-sm text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
                     >
-                        <span className="flex h-7 w-7 items-center justify-center rounded-lg border-2 border-dashed border-muted-foreground/30 text-[14px] shrink-0">
+                        <span className="flex h-7 w-7 items-center justify-center rounded-lg border-2 border-dashed border-muted-foreground/30 text-[14px] shrink-0 transition-transform duration-300 ease-in-out group-hover:rotate-90">
                             +
                         </span>
                         <span>New Haven</span>
