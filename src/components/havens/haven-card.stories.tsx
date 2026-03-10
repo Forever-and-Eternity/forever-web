@@ -10,6 +10,12 @@ const baseHaven: Haven = {
     ownerDisplayName: 'Jane Doe',
     memberCount: 5,
     contentCount: 42,
+    peopleCount: 12,
+    diaryCount: 8,
+    capsuleCount: 3,
+    lessonCount: 5,
+    storageSizeBytes: 524288000,
+    lastActivityAt: '2024-12-20T14:30:00Z',
     createdAt: '2024-01-15T10:30:00Z',
 };
 

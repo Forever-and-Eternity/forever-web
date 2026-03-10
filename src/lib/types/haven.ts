@@ -25,6 +25,12 @@ export interface Haven {
     ownerDisplayName?: string;
     memberCount: number;
     contentCount: number;
+    peopleCount: number;
+    diaryCount: number;
+    capsuleCount: number;
+    lessonCount: number;
+    storageSizeBytes: number;
+    lastActivityAt?: string;
     createdAt: string;
 }
 

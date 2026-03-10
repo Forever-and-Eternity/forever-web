@@ -76,7 +76,7 @@ export default function HavenDetailPage() {
 
     const links = [
         { label: 'Content', href: `/havens/${havenId}/content`, count: haven.contentCount },
-        { label: 'People', href: `/havens/${havenId}/people`, count: null },
+        { label: 'People', href: `/havens/${havenId}/people`, count: haven.peopleCount },
         { label: 'Feed', href: `/havens/${havenId}/feed`, count: null },
         { label: 'Members', href: `/havens/${havenId}/members`, count: haven.memberCount },
     ];

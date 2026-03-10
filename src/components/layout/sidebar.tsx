@@ -7,6 +7,8 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
+import { HoverCard, HoverCardContent, HoverCardTrigger } from '@/components/ui/hover-card';
+import { HavenHoverPreview } from '@/components/havens/haven-hover-preview';
 import { useAuthStore } from '@/lib/stores/auth-store';
 import { useHavenStore } from '@/lib/stores/haven-store';
 import { havensApi } from '@/lib/api/havens';
@@ -95,20 +97,26 @@ export function Sidebar({ onNavigate }: { onNavigate?: () => void } = {}) {
                 <div className="space-y-1">
                     <p className="px-2 py-1 text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">Havens</p>
                     {havens.map((haven) => (
-                        <Link
-                            key={haven.id}
-                            href={`/havens/${haven.id}`}
-                            onClick={onNavigate}
-                            className={cn(
-                                'flex items-center gap-2 rounded-lg px-2.5 py-2 text-sm transition-colors hover:bg-accent min-w-0',
-                                pathname.startsWith(`/havens/${haven.id}`) && 'bg-accent font-medium text-foreground',
-                            )}
-                        >
-                            <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-gradient-ig text-[11px] font-bold text-white shrink-0">
-                                {haven.name.charAt(0).toUpperCase()}
-                            </span>
-                            <span className="truncate">{haven.name}</span>
-                        </Link>
+                        <HoverCard key={haven.id} openDelay={400} closeDelay={100}>
+                            <HoverCardTrigger asChild>
+                                <Link
+                                    href={`/havens/${haven.id}`}
+                                    onClick={onNavigate}
+                                    className={cn(
+                                        'flex items-center gap-2 rounded-lg px-2.5 py-2 text-sm transition-colors hover:bg-accent min-w-0',
+                                        pathname.startsWith(`/havens/${haven.id}`) && 'bg-accent font-medium text-foreground',
+                                    )}
+                                >
+                                    <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-gradient-ig text-[11px] font-bold text-white shrink-0">
+                                        {haven.name.charAt(0).toUpperCase()}
+                                    </span>
+                                    <span className="truncate">{haven.name}</span>
+                                </Link>
+                            </HoverCardTrigger>
+                            <HoverCardContent className="w-72" side="right" align="start" sideOffset={12}>
+                                <HavenHoverPreview haven={haven} />
+                            </HoverCardContent>
+                        </HoverCard>
                     ))}
                     <Link
                         href="/havens/new"

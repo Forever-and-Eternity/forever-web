@@ -1,57 +1,70 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { House, MessageSquareText, Users, Clock, BookOpen, Lightbulb, HeartPulse, KeyRound } from 'lucide-react';
 
 const features = [
     {
         title: 'Private Havens',
-        description: 'Create dedicated spaces for different groups — family, friends, or just for yourself.',
-        icon: (
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-        ),
+        description: 'Create dedicated spaces for different groups — family, friends, or just for yourself. Complete privacy by default.',
+        icon: House,
     },
     {
         title: 'Rich Annotations',
-        description: 'Add stories, dates, locations, and lessons learned to every photo and document.',
-        icon: (
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-        ),
+        description: 'Add stories, dates, locations, and lessons learned to every photo and document you upload.',
+        icon: MessageSquareText,
     },
     {
         title: 'Tag & Connect',
-        description: 'Tag people in your content and invite them to see their own memories.',
-        icon: (
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-        ),
+        description: 'Tag people in your content and invite them to see their own memories across your havens.',
+        icon: Users,
     },
     {
-        title: 'Secure Sharing',
-        description: 'Share via invitation links. Recipients create accounts and access only what you allow.',
-        icon: (
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-        ),
+        title: 'Time Capsules',
+        description: 'Lock messages, photos, and videos to be delivered at future dates or life milestones.',
+        icon: Clock,
+    },
+    {
+        title: 'Life Journals',
+        description: 'Keep a private diary with mood tracking, tags, and attached photos. Build a streak of daily reflection.',
+        icon: BookOpen,
+    },
+    {
+        title: 'Life Lessons',
+        description: 'Record wisdom and advice organized by life stage — from parenting tips to financial insights.',
+        icon: Lightbulb,
+    },
+    {
+        title: 'Health Vault',
+        description: 'Track medical conditions, medications, allergies, and providers with an interactive body map.',
+        icon: HeartPulse,
+    },
+    {
+        title: 'Secure Keychain',
+        description: 'Store passwords, bank details, and legal documents with AES-256 encryption for your family.',
+        icon: KeyRound,
     },
 ];
 
 export function Features() {
     return (
-        <section className="bg-muted/30 px-4 py-24">
-            <div className="mx-auto max-w-5xl">
+        <section id="features" className="bg-muted/30 px-4 py-24">
+            <div className="mx-auto max-w-6xl">
                 <h2 className="mb-4 text-center text-3xl font-bold" style={{ fontFamily: 'var(--font-display-var), sans-serif' }}>
                     Everything you need to preserve memories
                 </h2>
                 <p className="mb-12 text-center text-muted-foreground max-w-2xl mx-auto">
-                    Built with care for the moments that matter most
+                    Built with care for the moments that matter most. From photos to passwords, from journals to time capsules.
                 </p>
-                <div className="grid gap-6 sm:grid-cols-2 animate-stagger">
+                <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4 animate-stagger">
                     {features.map((feature) => (
                         <Card key={feature.title} className="group hover:shadow-md transition-shadow">
                             <CardHeader>
                                 <div className="mb-2 flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-ig text-white">
-                                    {feature.icon}
+                                    <feature.icon className="h-5 w-5" />
                                 </div>
                                 <CardTitle className="text-lg">{feature.title}</CardTitle>
                             </CardHeader>
                             <CardContent>
-                                <p className="text-muted-foreground leading-relaxed">{feature.description}</p>
+                                <p className="text-muted-foreground leading-relaxed text-sm">{feature.description}</p>
                             </CardContent>
                         </Card>
                     ))}
