@@ -21,7 +21,7 @@ import { AnnotationList } from '@/components/annotations/annotation-list';
 import { AnnotationForm } from '@/components/annotations/annotation-form';
 import { PersonTagDialog } from '@/components/people/person-tag-dialog';
 import { contentApi } from '@/lib/api/content';
-import { ContentTypeLabels } from '@/lib/types/enums';
+import { ContentType, ContentTypeLabels } from '@/lib/types/enums';
 import type { ContentItem } from '@/lib/types/content';
 import { toast } from 'sonner';
 
@@ -71,7 +71,22 @@ export function ContentDetail({ havenId, contentId }: { havenId: string; content
             <div className="lg:col-span-2">
                 {item.mediaUrl && (
                     <div className="overflow-hidden rounded-lg bg-muted">
-                        <img src={item.mediaUrl} alt={item.title || 'Content'} className="w-full object-contain max-h-[600px]" />
+                        {item.contentType === ContentType.Document ? (
+                            <div className="flex flex-col items-center justify-center py-12 gap-4">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-rose-500"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M10 9H8"/><path d="M16 13H8"/><path d="M16 17H8"/></svg>
+                                <p className="text-sm text-muted-foreground">{item.title || 'Document'}</p>
+                                <a
+                                    href={item.mediaUrl}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="inline-flex items-center gap-2 rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90 transition-colors"
+                                >
+                                    Open Document
+                                </a>
+                            </div>
+                        ) : item.thumbnailUrl || item.mediaUrl ? (
+                            <img src={item.thumbnailUrl || item.mediaUrl} alt={item.title || 'Content'} className="w-full object-contain max-h-[600px]" />
+                        ) : null}
                     </div>
                 )}
                 <div className="mt-4">

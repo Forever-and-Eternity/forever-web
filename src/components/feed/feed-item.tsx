@@ -62,14 +62,19 @@ function timeAgo(date: string): string {
 }
 
 interface FeedItemProps {
-    item: FeedActivity;
-    onDismiss: (id: string) => void;
+    item?: FeedActivity;
+    activity?: FeedActivity;
+    onDismiss?: (id: string) => void;
+    compact?: boolean;
 }
 
-export function FeedItemCard({ item, onDismiss }: FeedItemProps) {
+export function FeedItemCard({ item: itemProp, activity, onDismiss, compact }: FeedItemProps) {
     const router = useRouter();
     const params = useParams();
     const havenId = params.havenId as string;
+
+    const item = (itemProp ?? activity)!;
+    if (!itemProp && !activity) return null;
 
     const Icon = activityIconMap[item.activityType] || Activity;
 
@@ -95,7 +100,27 @@ export function FeedItemCard({ item, onDismiss }: FeedItemProps) {
 
     function handleDismiss(e: React.MouseEvent) {
         e.stopPropagation();
-        onDismiss(item.id);
+        onDismiss?.(item.id);
+    }
+
+    if (compact) {
+        return (
+            <div
+                className="flex gap-3 items-center py-1.5 px-1 rounded-md cursor-pointer hover:bg-accent/40 transition-colors"
+                onClick={handleClick}
+            >
+                <div className="flex size-7 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
+                    <Icon className="size-3.5" />
+                </div>
+                <div className="flex-1 min-w-0">
+                    <p className="text-xs font-medium truncate">
+                        {(moodEmoji || emoji) && <span className="mr-1">{moodEmoji || emoji}</span>}
+                        {item.title}
+                    </p>
+                    <span className="text-[10px] text-muted-foreground">{timeAgo(item.createdAt)}</span>
+                </div>
+            </div>
+        );
     }
 
     return (
@@ -104,15 +129,17 @@ export function FeedItemCard({ item, onDismiss }: FeedItemProps) {
             onClick={handleClick}
         >
             {/* Dismiss button */}
-            <Button
-                variant="ghost"
-                size="icon-xs"
-                className="absolute top-2 right-2 text-muted-foreground hover:text-foreground"
-                onClick={handleDismiss}
-                aria-label="Dismiss activity"
-            >
-                <X className="size-3.5" />
-            </Button>
+            {onDismiss && (
+                <Button
+                    variant="ghost"
+                    size="icon-xs"
+                    className="absolute top-2 right-2 text-muted-foreground hover:text-foreground"
+                    onClick={handleDismiss}
+                    aria-label="Dismiss activity"
+                >
+                    <X className="size-3.5" />
+                </Button>
+            )}
 
             <CardContent className="flex gap-4 items-start">
                 {/* Icon */}

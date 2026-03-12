@@ -10,25 +10,30 @@ import type {
     UnlockResult,
 } from '@/lib/types/keychain';
 
+function sessionHeaders(sessionToken: string) {
+    return { headers: { 'X-Vault-Session': sessionToken } };
+}
+
 export const keychainApi = {
     unlock: (havenId: string, password: string) =>
         api.post<ApiResponse<UnlockResult>>(`/havens/${havenId}/keychain/unlock`, { password }),
 
-    getCategories: (havenId: string) =>
-        api.get<ApiResponse<KeychainCategory[]>>(`/havens/${havenId}/keychain/categories`),
-    createCategory: (havenId: string, data: CreateCategoryRequest) =>
-        api.post<ApiResponse<KeychainCategory>>(`/havens/${havenId}/keychain/categories`, data),
+    getCategories: (havenId: string, sessionToken: string) =>
+        api.get<ApiResponse<KeychainCategory[]>>(`/havens/${havenId}/keychain/categories`, sessionHeaders(sessionToken)),
+    createCategory: (havenId: string, data: CreateCategoryRequest, sessionToken: string) =>
+        api.post<ApiResponse<KeychainCategory>>(`/havens/${havenId}/keychain/categories`, data, sessionHeaders(sessionToken)),
 
-    createEntry: (havenId: string, data: CreateEntryRequest) =>
-        api.post<ApiResponse<KeychainEntryList>>(`/havens/${havenId}/keychain`, data),
-    getEntries: (havenId: string, categoryId?: string) =>
+    createEntry: (havenId: string, data: CreateEntryRequest, sessionToken: string) =>
+        api.post<ApiResponse<KeychainEntryList>>(`/havens/${havenId}/keychain`, data, sessionHeaders(sessionToken)),
+    getEntries: (havenId: string, sessionToken: string, categoryId?: string) =>
         api.get<ApiResponse<KeychainEntryList[]>>(`/havens/${havenId}/keychain`, {
             params: { categoryId },
+            ...sessionHeaders(sessionToken),
         }),
-    getEntry: (havenId: string, entryId: string) =>
-        api.get<ApiResponse<KeychainEntry>>(`/havens/${havenId}/keychain/${entryId}`),
-    updateEntry: (havenId: string, entryId: string, data: UpdateEntryRequest) =>
-        api.put<ApiResponse<KeychainEntryList>>(`/havens/${havenId}/keychain/${entryId}`, data),
-    deleteEntry: (havenId: string, entryId: string) =>
-        api.delete<ApiResponse>(`/havens/${havenId}/keychain/${entryId}`),
+    getEntry: (havenId: string, entryId: string, sessionToken: string) =>
+        api.get<ApiResponse<KeychainEntry>>(`/havens/${havenId}/keychain/${entryId}`, sessionHeaders(sessionToken)),
+    updateEntry: (havenId: string, entryId: string, data: UpdateEntryRequest, sessionToken: string) =>
+        api.put<ApiResponse<KeychainEntryList>>(`/havens/${havenId}/keychain/${entryId}`, data, sessionHeaders(sessionToken)),
+    deleteEntry: (havenId: string, entryId: string, sessionToken: string) =>
+        api.delete<ApiResponse>(`/havens/${havenId}/keychain/${entryId}`, sessionHeaders(sessionToken)),
 };

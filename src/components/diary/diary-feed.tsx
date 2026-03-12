@@ -30,7 +30,7 @@ export function DiaryFeed({ havenId }: { havenId: string }) {
 
     if (loading && entries.length === 0) {
         return (
-            <div className="space-y-3">
+            <div className="space-y-5">
                 {[1, 2, 3].map((i) => (
                     <Skeleton key={i} className="h-28 rounded-lg" />
                 ))}
@@ -51,7 +51,7 @@ export function DiaryFeed({ havenId }: { havenId: string }) {
     }
 
     return (
-        <div className="space-y-3">
+        <div className="space-y-6">
             {entries.map((entry) => (
                 <DiaryEntryCard key={entry.id} entry={entry} havenId={havenId} />
             ))}

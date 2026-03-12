@@ -20,6 +20,7 @@ const mockUser: UserProfile = {
         emailNotifications: true,
         colorPalette: 'lavender',
         fontFamily: 'nunito',
+        vaultAutoLockSeconds: 60,
     },
 };
 

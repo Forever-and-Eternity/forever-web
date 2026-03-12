@@ -13,7 +13,8 @@ import { AllergyList } from '@/components/health/allergy-list';
 import { ProviderList } from '@/components/health/provider-list';
 import { healthApi } from '@/lib/api/health';
 import type { BodyMapRegion, MedicalCondition } from '@/lib/types/health';
-import { Activity } from 'lucide-react';
+import { Activity, ChevronDown } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 export default function HealthPage() {
     const params = useParams();
@@ -24,6 +25,7 @@ export default function HealthPage() {
     const [loadingMap, setLoadingMap] = useState(true);
     const [loadingConditions, setLoadingConditions] = useState(false);
     const [tab, setTab] = useState('body-map');
+    const [expandedId, setExpandedId] = useState<string | null>(null);
 
     const loadBodyMap = useCallback(() => {
         healthApi
@@ -118,37 +120,94 @@ export default function HealthPage() {
                                     No conditions for this region.
                                 </p>
                             ) : (
-                                conditions.map((c) => (
-                                    <Card key={c.id}>
-                                        <CardContent className="py-3 flex items-center gap-3">
-                                            <Activity className="h-4 w-4 text-primary shrink-0" />
-                                            <div className="flex-1 min-w-0">
-                                                <p className="text-sm font-medium">{c.name}</p>
-                                                {c.notes && (
-                                                    <p className="text-xs text-muted-foreground line-clamp-1">
-                                                        {c.notes}
-                                                    </p>
+                                conditions.map((c) => {
+                                    const isExpanded = expandedId === c.id;
+                                    const severityColor: Record<string, string> = {
+                                        mild: 'bg-green-100 text-green-800 border-green-300 dark:bg-green-900/40 dark:text-green-300 dark:border-green-700',
+                                        moderate: 'bg-amber-100 text-amber-800 border-amber-300 dark:bg-amber-900/40 dark:text-amber-300 dark:border-amber-700',
+                                        severe: 'bg-red-100 text-red-800 border-red-300 dark:bg-red-900/40 dark:text-red-300 dark:border-red-700',
+                                        critical: 'bg-red-200 text-red-900 border-red-400 dark:bg-red-900/60 dark:text-red-200 dark:border-red-600',
+                                    };
+                                    const statusColor: Record<string, string> = {
+                                        active: 'bg-blue-100 text-blue-800 border-blue-300 dark:bg-blue-900/40 dark:text-blue-300 dark:border-blue-700',
+                                        resolved: 'bg-green-100 text-green-800 border-green-300 dark:bg-green-900/40 dark:text-green-300 dark:border-green-700',
+                                        chronic: 'bg-purple-100 text-purple-800 border-purple-300 dark:bg-purple-900/40 dark:text-purple-300 dark:border-purple-700',
+                                        monitoring: 'bg-sky-100 text-sky-800 border-sky-300 dark:bg-sky-900/40 dark:text-sky-300 dark:border-sky-700',
+                                    };
+                                    return (
+                                        <Card
+                                            key={c.id}
+                                            className="cursor-pointer transition-all hover:border-primary/30"
+                                            onClick={() => setExpandedId(isExpanded ? null : c.id)}
+                                        >
+                                            <CardContent className="py-3">
+                                                <div className="flex items-center gap-3">
+                                                    <Activity className="h-4 w-4 text-primary shrink-0" />
+                                                    <div className="flex-1 min-w-0">
+                                                        <p className="text-sm font-medium">{c.name}</p>
+                                                        {!isExpanded && c.notes && (
+                                                            <p className="text-xs text-muted-foreground line-clamp-1">
+                                                                {c.notes}
+                                                            </p>
+                                                        )}
+                                                    </div>
+                                                    <div className="flex items-center gap-1.5 shrink-0">
+                                                        {c.severity && (
+                                                            <Badge
+                                                                variant="outline"
+                                                                className={cn(
+                                                                    'text-xs capitalize border',
+                                                                    severityColor[c.severity.toLowerCase()] ?? ''
+                                                                )}
+                                                            >
+                                                                {c.severity}
+                                                            </Badge>
+                                                        )}
+                                                        <Badge
+                                                            variant="outline"
+                                                            className={cn(
+                                                                'text-xs capitalize border',
+                                                                statusColor[c.status.toLowerCase()] ?? ''
+                                                            )}
+                                                        >
+                                                            {c.status}
+                                                        </Badge>
+                                                        <ChevronDown
+                                                            className={cn(
+                                                                'h-4 w-4 text-muted-foreground transition-transform',
+                                                                isExpanded && 'rotate-180'
+                                                            )}
+                                                        />
+                                                    </div>
+                                                </div>
+                                                {isExpanded && (
+                                                    <div className="mt-3 pl-7 space-y-2 text-sm">
+                                                        {c.notes && (
+                                                            <div>
+                                                                <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Notes</span>
+                                                                <p className="text-muted-foreground mt-0.5">{c.notes}</p>
+                                                            </div>
+                                                        )}
+                                                        {c.diagnosedAt && (
+                                                            <div>
+                                                                <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Diagnosed</span>
+                                                                <p className="text-muted-foreground mt-0.5">
+                                                                    {new Date(c.diagnosedAt).toLocaleDateString(undefined, { month: 'long', day: 'numeric', year: 'numeric' })}
+                                                                </p>
+                                                            </div>
+                                                        )}
+                                                        {c.bodyRegion && (
+                                                            <div>
+                                                                <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Region</span>
+                                                                <p className="text-muted-foreground mt-0.5 capitalize">{c.bodyRegion.replace(/_/g, ' ')}</p>
+                                                            </div>
+                                                        )}
+                                                    </div>
                                                 )}
-                                            </div>
-                                            <div className="flex gap-1.5 shrink-0">
-                                                {c.severity && (
-                                                    <Badge
-                                                        variant="outline"
-                                                        className="text-xs capitalize"
-                                                    >
-                                                        {c.severity}
-                                                    </Badge>
-                                                )}
-                                                <Badge
-                                                    variant="secondary"
-                                                    className="text-xs capitalize"
-                                                >
-                                                    {c.status}
-                                                </Badge>
-                                            </div>
-                                        </CardContent>
-                                    </Card>
-                                ))
+                                            </CardContent>
+                                        </Card>
+                                    );
+                                })
                             )}
                         </div>
                     )}

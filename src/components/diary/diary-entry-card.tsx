@@ -13,10 +13,10 @@ export function DiaryEntryCard({ entry, havenId }: { entry: DiaryEntry; havenId:
     const monthYear = date.toLocaleDateString(undefined, { month: 'short', year: 'numeric' });
 
     return (
-        <Link href={`/havens/${havenId}/journals/${entry.id}`}>
+        <Link href={`/havens/${havenId}/journals/${entry.id}`} className="block">
             <Card className="hover:border-primary/30 transition-colors">
-                <CardContent className="py-3">
-                    <div className="flex gap-3">
+                <CardContent className="py-5">
+                    <div className="flex gap-4">
                         {/* Date column */}
                         <div className="flex flex-col items-center justify-start pt-0.5 min-w-[44px]">
                             <span className="text-xs text-muted-foreground">{dayName}</span>

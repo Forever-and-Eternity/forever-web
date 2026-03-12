@@ -41,9 +41,9 @@ export function HavenNav() {
     ];
 
     return (
-        <div className="border-b bg-card/50 backdrop-blur-sm">
+        <div className="hidden md:block border-b bg-card/50 backdrop-blur-sm">
             <ScrollArea className="w-full">
-                <nav className="flex items-center gap-0.5 sm:gap-1 px-2 sm:px-4 py-1.5">
+                <nav className="flex flex-nowrap items-center gap-0.5 sm:gap-1 px-2 sm:px-4 py-1.5">
                     {navItems.map((item) => {
                         const isActive =
                             pathname === item.href || pathname.startsWith(item.href + '/');
@@ -55,10 +55,10 @@ export function HavenNav() {
                                     <Link
                                         href={item.href}
                                         className={cn(
-                                            'inline-flex items-center justify-center gap-1.5 rounded-md px-2.5 py-2 text-xs sm:text-sm font-medium transition-colors whitespace-nowrap',
+                                            'inline-flex items-center justify-center gap-1.5 rounded-2xl px-2.5 py-1.5 text-xs sm:text-sm font-medium transition-all whitespace-nowrap border-2 border-transparent',
                                             isActive
-                                                ? 'bg-primary/15 text-primary'
-                                                : 'text-muted-foreground hover:bg-accent hover:text-accent-foreground'
+                                                ? 'border-primary/50 bg-primary/10 text-primary shadow-sm'
+                                                : 'text-muted-foreground hover:border-primary/40 hover:bg-primary/5 hover:shadow-sm'
                                         )}
                                     >
                                         <Icon className="h-4 w-4 shrink-0" />

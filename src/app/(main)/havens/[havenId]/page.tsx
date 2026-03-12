@@ -1,17 +1,65 @@
 'use client';
 
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
-import { Camera, Loader2 } from 'lucide-react';
+import {
+    Camera,
+    Loader2,
+    ImageIcon,
+    Users,
+    Activity,
+    UserCog,
+    BookOpen,
+    TimerIcon,
+    GraduationCap,
+    HeartPulse,
+    KeyRound,
+} from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { ImageCropDialog } from '@/components/settings/avatar-crop-dialog';
+import { FeedItemCard } from '@/components/feed/feed-item';
 import { havensApi } from '@/lib/api/havens';
+import { feedApi } from '@/lib/api/feed';
 import { useHavenStore } from '@/lib/stores/haven-store';
 import { useAuthStore } from '@/lib/stores/auth-store';
 import { toast } from 'sonner';
+import type { FeedActivity } from '@/lib/types/feed';
+
+const SECTION_ICONS: Record<string, React.ElementType> = {
+    Content: ImageIcon,
+    People: Users,
+    Members: UserCog,
+    Journals: BookOpen,
+    Capsules: TimerIcon,
+    Lessons: GraduationCap,
+    Health: HeartPulse,
+    Vault: KeyRound,
+};
+
+const SECTION_COLORS: Record<string, string> = {
+    Content: 'border-primary/30 hover:border-primary/50',
+    People: 'border-pink-500/30 hover:border-pink-500/50',
+    Members: 'border-violet-500/30 hover:border-violet-500/50',
+    Journals: 'border-amber-500/30 hover:border-amber-500/50',
+    Capsules: 'border-cyan-500/30 hover:border-cyan-500/50',
+    Lessons: 'border-emerald-500/30 hover:border-emerald-500/50',
+    Health: 'border-rose-500/30 hover:border-rose-500/50',
+    Vault: 'border-indigo-500/30 hover:border-indigo-500/50',
+};
+
+const SECTION_ICON_COLORS: Record<string, string> = {
+    Content: 'text-primary',
+    People: 'text-pink-500',
+    Members: 'text-violet-500',
+    Journals: 'text-amber-500',
+    Capsules: 'text-cyan-500',
+    Lessons: 'text-emerald-500',
+    Health: 'text-rose-500',
+    Vault: 'text-indigo-500',
+};
 
 export default function HavenDetailPage() {
     const params = useParams();
@@ -24,6 +72,23 @@ export default function HavenDetailPage() {
     const [cropFile, setCropFile] = useState<File | null>(null);
     const [cropDialogOpen, setCropDialogOpen] = useState(false);
     const fileInputRef = useRef<HTMLInputElement>(null);
+
+    // Feed preview
+    const [feedItems, setFeedItems] = useState<FeedActivity[]>([]);
+    const [feedLoading, setFeedLoading] = useState(true);
+
+    useEffect(() => {
+        if (!havenId) return;
+        setFeedLoading(true);
+        feedApi
+            .getActivities(havenId, 1, 8)
+            .then(({ data: res }) => {
+                if (res.success && res.data) {
+                    setFeedItems(res.data.items);
+                }
+            })
+            .finally(() => setFeedLoading(false));
+    }, [havenId]);
 
     if (!haven || haven.id !== havenId) return <Skeleton className="h-64 rounded-lg" />;
 
@@ -74,11 +139,15 @@ export default function HavenDetailPage() {
         setCropFile(null);
     }
 
-    const links = [
-        { label: 'Content', href: `/havens/${havenId}/content`, count: haven.contentCount },
-        { label: 'People', href: `/havens/${havenId}/people`, count: haven.peopleCount },
-        { label: 'Feed', href: `/havens/${havenId}/feed`, count: null },
-        { label: 'Members', href: `/havens/${havenId}/members`, count: haven.memberCount },
+    const sections = [
+        { label: 'Content', href: `/havens/${havenId}/content`, count: haven.contentCount, desc: 'Photos & documents' },
+        { label: 'People', href: `/havens/${havenId}/people`, count: haven.peopleCount, desc: 'Tagged people' },
+        { label: 'Members', href: `/havens/${havenId}/members`, count: haven.memberCount, desc: 'Haven members' },
+        { label: 'Journals', href: `/havens/${havenId}/journals`, count: haven.diaryCount, desc: 'Diary entries' },
+        { label: 'Capsules', href: `/havens/${havenId}/capsules`, count: haven.capsuleCount, desc: 'Time capsules' },
+        { label: 'Lessons', href: `/havens/${havenId}/lessons`, count: haven.lessonCount, desc: 'Life lessons' },
+        { label: 'Health', href: `/havens/${havenId}/health`, count: null, desc: 'Medical records' },
+        { label: 'Vault', href: `/havens/${havenId}/vault`, count: null, desc: 'Secure keychain' },
     ];
 
     return (
@@ -127,22 +196,100 @@ export default function HavenDetailPage() {
                 {haven.description && <p className="mt-1 text-muted-foreground">{haven.description}</p>}
             </div>
 
-            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4 animate-stagger">
-                {links.map(({ label, href, count }) => (
-                    <Link key={label} href={href}>
-                        <Card className="transition-shadow hover:shadow-md">
-                            <CardHeader className="pb-2">
-                                <CardTitle className="text-base">{label}</CardTitle>
-                            </CardHeader>
-                            <CardContent>
-                                {count !== null && <p className="text-2xl font-bold">{count}</p>}
-                                <Button variant="link" className="mt-1 h-auto p-0 text-sm">
-                                    View {label.toLowerCase()}
+            {/* Mobile: horizontal scrollable section nav at bottom is handled via mobile nav below */}
+            {/* Desktop: Feed left + section grid right */}
+            <div className="hidden md:grid md:grid-cols-[1fr_1.2fr] gap-5">
+                {/* Feed panel - left, larger */}
+                <Link href={`/havens/${havenId}/feed`} className="block">
+                    <Card className="h-full border-2 border-primary/20 hover:border-primary/40 transition-colors">
+                        <CardHeader className="pb-3">
+                            <div className="flex items-center gap-2">
+                                <Activity className="size-5 text-primary" />
+                                <CardTitle className="text-lg">Activity Feed</CardTitle>
+                            </div>
+                        </CardHeader>
+                        <CardContent className="space-y-2.5">
+                            {feedLoading ? (
+                                <>
+                                    <Skeleton className="h-12 rounded" />
+                                    <Skeleton className="h-12 rounded" />
+                                    <Skeleton className="h-12 rounded" />
+                                </>
+                            ) : feedItems.length === 0 ? (
+                                <p className="text-sm text-muted-foreground py-4 text-center">No recent activity</p>
+                            ) : (
+                                <>
+                                    {feedItems.slice(0, 6).map((item) => (
+                                        <FeedItemCard key={item.id} activity={item} compact />
+                                    ))}
+                                    {feedItems.length > 6 && (
+                                        <p className="text-xs text-muted-foreground text-center pt-1">
+                                            +{feedItems.length - 6} more activities
+                                        </p>
+                                    )}
+                                </>
+                            )}
+                            <div className="pt-2">
+                                <Button variant="outline" size="sm" className="w-full">
+                                    View all activity
                                 </Button>
-                            </CardContent>
-                        </Card>
-                    </Link>
-                ))}
+                            </div>
+                        </CardContent>
+                    </Card>
+                </Link>
+
+                {/* Section grid - right */}
+                <div className="grid grid-cols-2 gap-3">
+                    {sections.map(({ label, href, count, desc }) => {
+                        const Icon = SECTION_ICONS[label];
+                        const borderClass = SECTION_COLORS[label];
+                        const iconColor = SECTION_ICON_COLORS[label];
+                        return (
+                            <Link key={label} href={href}>
+                                <Card className={`h-full border-2 transition-all hover:shadow-md ${borderClass}`}>
+                                    <CardContent className="p-4 flex flex-col gap-2">
+                                        <div className="flex items-center gap-2.5">
+                                            <Icon className={`size-5 ${iconColor}`} />
+                                            <span className="font-semibold text-sm">{label}</span>
+                                        </div>
+                                        <p className="text-xs text-muted-foreground">{desc}</p>
+                                        {count !== null && (
+                                            <p className="text-xl font-bold mt-auto">{count}</p>
+                                        )}
+                                    </CardContent>
+                                </Card>
+                            </Link>
+                        );
+                    })}
+                </div>
+            </div>
+
+            {/* Mobile layout: full feed (bottom nav is in layout) */}
+            <div className="md:hidden">
+                <div className="space-y-2">
+                    <div className="flex items-center justify-between mb-3">
+                        <div className="flex items-center gap-2">
+                            <Activity className="size-5 text-primary" />
+                            <h3 className="text-base font-semibold">Activity Feed</h3>
+                        </div>
+                        <Button variant="ghost" size="sm" asChild>
+                            <Link href={`/havens/${havenId}/feed`}>View all</Link>
+                        </Button>
+                    </div>
+                    {feedLoading ? (
+                        <>
+                            <Skeleton className="h-12 rounded" />
+                            <Skeleton className="h-12 rounded" />
+                            <Skeleton className="h-12 rounded" />
+                        </>
+                    ) : feedItems.length === 0 ? (
+                        <p className="text-sm text-muted-foreground py-8 text-center">No recent activity</p>
+                    ) : (
+                        feedItems.map((item) => (
+                            <FeedItemCard key={item.id} activity={item} compact />
+                        ))
+                    )}
+                </div>
             </div>
 
             <ImageCropDialog

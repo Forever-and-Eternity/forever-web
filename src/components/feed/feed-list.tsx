@@ -13,11 +13,14 @@ type RangePreset = '7d' | '30d' | 'all';
 function daysAgoISO(days: number): string {
     const d = new Date();
     d.setDate(d.getDate() - days);
-    return d.toISOString().slice(0, 10);
+    d.setHours(0, 0, 0, 0);
+    return d.toISOString();
 }
 
-function todayISO(): string {
-    return new Date().toISOString().slice(0, 10);
+function endOfTodayISO(): string {
+    const d = new Date();
+    d.setHours(23, 59, 59, 999);
+    return d.toISOString();
 }
 
 function formatDayLabel(dateStr: string): string {
@@ -92,8 +95,8 @@ export function FeedList({ havenId }: { havenId: string }) {
         from?: string;
         to?: string;
     } => {
-        if (preset === '7d') return { from: daysAgoISO(7), to: todayISO() };
-        if (preset === '30d') return { from: daysAgoISO(30), to: todayISO() };
+        if (preset === '7d') return { from: daysAgoISO(7), to: endOfTodayISO() };
+        if (preset === '30d') return { from: daysAgoISO(30), to: endOfTodayISO() };
         if (preset === 'all') return {};
         return {};
     }, [preset]);
@@ -104,8 +107,8 @@ export function FeedList({ havenId }: { havenId: string }) {
     } => {
         if (customFrom || customTo) {
             return {
-                from: customFrom || undefined,
-                to: customTo || undefined,
+                from: customFrom ? `${customFrom}T00:00:00Z` : undefined,
+                to: customTo ? `${customTo}T23:59:59Z` : undefined,
             };
         }
         return getDateRange();

@@ -15,6 +15,7 @@ import {
 import {
   Sheet,
   SheetContent,
+  SheetDescription,
   SheetHeader,
   SheetTitle,
 } from '@/components/ui/sheet';
@@ -44,6 +45,7 @@ const ENTRY_TYPES = [
 interface KeychainEntryFormProps {
   havenId: string;
   password: string;
+  sessionToken: string;
   categoryId: string;
   entry?: KeychainEntry;
   open: boolean;
@@ -54,6 +56,7 @@ interface KeychainEntryFormProps {
 export function KeychainEntryForm({
   havenId,
   password,
+  sessionToken,
   categoryId,
   entry,
   open,
@@ -261,7 +264,7 @@ export function KeychainEntryForm({
           iv,
           notes: notes || undefined,
           contentIds,
-        });
+        }, sessionToken);
         toast.success('Entry updated');
       } else {
         await keychainApi.createEntry(havenId, {
@@ -272,7 +275,7 @@ export function KeychainEntryForm({
           iv,
           notes: notes || undefined,
           contentIds,
-        });
+        }, sessionToken);
         toast.success('Entry created');
       }
       onOpenChange(false);
@@ -289,6 +292,7 @@ export function KeychainEntryForm({
       <SheetContent className="overflow-y-auto">
         <SheetHeader>
           <SheetTitle>{entry ? 'Edit Entry' : 'New Entry'}</SheetTitle>
+          <SheetDescription>{entry ? 'Update this vault entry' : 'Add a new vault entry'}</SheetDescription>
         </SheetHeader>
         {decrypting ? (
           <div className="flex items-center justify-center py-12 px-4">

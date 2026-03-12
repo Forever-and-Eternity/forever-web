@@ -5,6 +5,7 @@ import { useParams } from 'next/navigation';
 import { havensApi } from '@/lib/api/havens';
 import { useHavenStore } from '@/lib/stores/haven-store';
 import { HavenNav } from '@/components/layout/haven-nav';
+import { HavenMobileNav } from '@/components/layout/haven-mobile-nav';
 
 export default function HavenLayout({ children }: { children: React.ReactNode }) {
     const params = useParams();
@@ -26,7 +27,8 @@ export default function HavenLayout({ children }: { children: React.ReactNode })
     return (
         <div className="-m-4 sm:-m-6 flex flex-col h-[calc(100%+2rem)] sm:h-[calc(100%+3rem)]">
             <HavenNav />
-            <div className="flex-1 overflow-y-auto p-4 sm:p-6">{children}</div>
+            <div className="flex-1 overflow-y-auto p-4 sm:p-6 pb-20 md:pb-6">{children}</div>
+            <HavenMobileNav />
         </div>
     );
 }

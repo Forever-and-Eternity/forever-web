@@ -12,6 +12,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/comp
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
   DialogFooter,
@@ -19,6 +20,7 @@ import {
 import {
   Sheet,
   SheetContent,
+  SheetDescription,
   SheetHeader,
   SheetTitle,
 } from '@/components/ui/sheet';
@@ -47,9 +49,8 @@ import {
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { contentApi } from '@/lib/api/content';
+import { useAuthStore } from '@/lib/stores/auth-store';
 import type { ContentItem } from '@/lib/types/content';
-
-const SESSION_TIMEOUT_MS = 5 * 60 * 1000; // 5 minutes
 
 const ENTRY_TYPE_ICONS: Record<string, React.ElementType> = {
   login: Lock,
@@ -90,10 +91,13 @@ const SENSITIVE_FIELDS = new Set(['password', 'accountNumber', 'sortCode', 'iban
 export default function VaultPage() {
   const params = useParams();
   const havenId = params.havenId as string;
+  const user = useAuthStore((s) => s.user);
+  const autoLockSeconds = user?.preferences?.vaultAutoLockSeconds ?? 60;
 
   // Auth state
   const [unlocked, setUnlocked] = useState(false);
   const [vaultPassword, setVaultPassword] = useState('');
+  const [sessionToken, setSessionToken] = useState('');
   const unlockTimeRef = useRef<number>(0);
 
   // Data state
@@ -119,24 +123,26 @@ export default function VaultPage() {
   const [visibleFields, setVisibleFields] = useState<Set<string>>(new Set());
   const [viewAttachments, setViewAttachments] = useState<ContentItem[]>([]);
 
-  // Session timeout: auto-lock after 5 minutes
+  // Session timeout: auto-lock after configurable period
   useEffect(() => {
     if (!unlocked) return;
 
     const timer = setTimeout(() => {
       setUnlocked(false);
       setVaultPassword('');
+      setSessionToken('');
       setCategories([]);
       setEntries([]);
       setSelectedCategoryId(undefined);
       toast.info('Vault locked due to inactivity');
-    }, SESSION_TIMEOUT_MS);
+    }, autoLockSeconds * 1000);
 
     return () => clearTimeout(timer);
-  }, [unlocked]);
+  }, [unlocked, autoLockSeconds]);
 
-  const handleUnlock = (password: string) => {
+  const handleUnlock = (password: string, token: string) => {
     setVaultPassword(password);
+    setSessionToken(token);
     setUnlocked(true);
     unlockTimeRef.current = Date.now();
   };
@@ -146,7 +152,7 @@ export default function VaultPage() {
     if (!unlocked) return;
     setLoadingCategories(true);
     keychainApi
-      .getCategories(havenId)
+      .getCategories(havenId, sessionToken)
       .then(({ data: res }) => {
         if (res.success && res.data) {
           setCategories(res.data);
@@ -160,7 +166,7 @@ export default function VaultPage() {
         toast.error('Failed to load categories');
       })
       .finally(() => setLoadingCategories(false));
-  }, [havenId, unlocked, selectedCategoryId]);
+  }, [havenId, unlocked, selectedCategoryId, sessionToken]);
 
   useEffect(() => {
     loadCategories();
@@ -174,7 +180,7 @@ export default function VaultPage() {
     }
     setLoadingEntries(true);
     keychainApi
-      .getEntries(havenId, selectedCategoryId)
+      .getEntries(havenId, sessionToken, selectedCategoryId)
       .then(({ data: res }) => {
         if (res.success && res.data) setEntries(res.data);
       })
@@ -182,7 +188,7 @@ export default function VaultPage() {
         toast.error('Failed to load entries');
       })
       .finally(() => setLoadingEntries(false));
-  }, [havenId, unlocked, selectedCategoryId]);
+  }, [havenId, unlocked, selectedCategoryId, sessionToken]);
 
   useEffect(() => {
     loadEntries();
@@ -198,7 +204,7 @@ export default function VaultPage() {
         name: newCategoryName.trim(),
         icon: newCategoryIcon.trim() || undefined,
         sortOrder: categories.length,
-      });
+      }, sessionToken);
       if (res.success && res.data) {
         setCategories((prev) => [...prev, res.data!]);
         setSelectedCategoryId(res.data.id);
@@ -222,7 +228,7 @@ export default function VaultPage() {
     setVisibleFields(new Set());
     setViewAttachments([]);
     try {
-      const { data: res } = await keychainApi.getEntry(havenId, entryId);
+      const { data: res } = await keychainApi.getEntry(havenId, entryId, sessionToken);
       if (res.success && res.data) {
         setViewEntry(res.data);
         const plaintext = await decrypt(
@@ -266,7 +272,7 @@ export default function VaultPage() {
   const handleDeleteEntry = async () => {
     if (!viewEntry) return;
     try {
-      await keychainApi.deleteEntry(havenId, viewEntry.id);
+      await keychainApi.deleteEntry(havenId, viewEntry.id, sessionToken);
       toast.success('Entry deleted');
       setViewSheetOpen(false);
       setViewEntry(undefined);
@@ -326,6 +332,7 @@ export default function VaultPage() {
           onClick={() => {
             setUnlocked(false);
             setVaultPassword('');
+            setSessionToken('');
             setCategories([]);
             setEntries([]);
             setSelectedCategoryId(undefined);
@@ -390,6 +397,7 @@ export default function VaultPage() {
         <DialogContent>
           <DialogHeader>
             <DialogTitle>New Category</DialogTitle>
+            <DialogDescription>Create a new category to organise your entries</DialogDescription>
           </DialogHeader>
           <form onSubmit={handleAddCategory} className="space-y-4">
             <div className="space-y-2">
@@ -429,6 +437,7 @@ export default function VaultPage() {
         <KeychainEntryForm
           havenId={havenId}
           password={vaultPassword}
+          sessionToken={sessionToken}
           categoryId={selectedCategoryId}
           entry={editingEntry}
           open={entryFormOpen}
@@ -453,6 +462,7 @@ export default function VaultPage() {
         <SheetContent className="overflow-y-auto">
           <SheetHeader>
             <SheetTitle>{viewEntry?.label || 'Entry'}</SheetTitle>
+            <SheetDescription>View and manage this vault entry</SheetDescription>
           </SheetHeader>
           {viewDecrypting ? (
             <div className="flex items-center justify-center py-12 px-4">

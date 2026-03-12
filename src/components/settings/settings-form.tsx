@@ -101,6 +101,7 @@ export function SettingsForm() {
         emailNotifications: true,
         colorPalette: 'lavender',
         fontFamily: 'nunito',
+        vaultAutoLockSeconds: 60,
     });
 
     useEffect(() => {
@@ -115,6 +116,7 @@ export function SettingsForm() {
                     emailNotifications: res.data.emailNotifications ?? true,
                     colorPalette: res.data.colorPalette || 'lavender',
                     fontFamily: res.data.fontFamily || 'nunito',
+                    vaultAutoLockSeconds: res.data.vaultAutoLockSeconds ?? 60,
                 };
                 setPreferences(prefs);
                 initialPrefsRef.current = {
@@ -480,6 +482,41 @@ export function SettingsForm() {
                             checked={preferences.showAnnotationsInFeed}
                             onCheckedChange={(v) => updatePref('showAnnotationsInFeed', v)}
                         />
+                    </div>
+                </CardContent>
+            </Card>
+
+            {/* Security Section */}
+            <Card>
+                <CardHeader>
+                    <CardTitle>Security</CardTitle>
+                    <CardDescription>Configure vault and security settings</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                    <div className="flex items-center justify-between">
+                        <div className="space-y-0.5">
+                            <Label>Vault Auto-Lock</Label>
+                            <p className="text-xs text-muted-foreground">
+                                Automatically lock the vault after inactivity
+                            </p>
+                        </div>
+                        <Select
+                            value={String(preferences.vaultAutoLockSeconds)}
+                            onValueChange={(v) => updatePref('vaultAutoLockSeconds', Number(v))}
+                        >
+                            <SelectTrigger className="w-36">
+                                <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="10">10 seconds</SelectItem>
+                                <SelectItem value="15">15 seconds</SelectItem>
+                                <SelectItem value="20">20 seconds</SelectItem>
+                                <SelectItem value="30">30 seconds</SelectItem>
+                                <SelectItem value="45">45 seconds</SelectItem>
+                                <SelectItem value="60">60 seconds</SelectItem>
+                                <SelectItem value="90">90 seconds</SelectItem>
+                            </SelectContent>
+                        </Select>
                     </div>
                 </CardContent>
             </Card>

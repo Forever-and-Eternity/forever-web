@@ -11,7 +11,7 @@ import { toast } from 'sonner';
 
 interface KeychainUnlockProps {
   havenId: string;
-  onUnlock: (password: string) => void;
+  onUnlock: (password: string, sessionToken: string) => void;
 }
 
 export function KeychainUnlock({ havenId, onUnlock }: KeychainUnlockProps) {
@@ -26,9 +26,9 @@ export function KeychainUnlock({ havenId, onUnlock }: KeychainUnlockProps) {
     setLoading(true);
     try {
       const { data: res } = await keychainApi.unlock(havenId, password);
-      if (res.success) {
+      if (res.success && res.data) {
         toast.success('Vault unlocked');
-        onUnlock(password);
+        onUnlock(password, res.data.sessionToken);
       } else {
         setError('Invalid password');
       }

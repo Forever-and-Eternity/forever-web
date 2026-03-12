@@ -103,14 +103,23 @@ export function Sidebar({ onNavigate }: { onNavigate?: () => void } = {}) {
                                     href={`/havens/${haven.id}`}
                                     onClick={onNavigate}
                                     className={cn(
-                                        'flex items-center gap-2 rounded-lg px-2.5 py-2 text-sm transition-colors hover:bg-accent min-w-0',
-                                        pathname.startsWith(`/havens/${haven.id}`) && 'bg-accent font-medium text-foreground',
+                                        'flex items-center gap-2 rounded-2xl px-2.5 py-2 text-sm transition-all min-w-0 border-2 border-transparent hover:border-primary/40 hover:bg-primary/5 hover:shadow-sm',
+                                        pathname.startsWith(`/havens/${haven.id}`)
+                                            ? 'border-primary/50 bg-primary/10 font-medium text-foreground shadow-sm'
+                                            : '',
                                     )}
                                 >
                                     <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-gradient-ig text-[11px] font-bold text-white shrink-0">
                                         {haven.name.charAt(0).toUpperCase()}
                                     </span>
-                                    <span className="truncate">{haven.name}</span>
+                                    <div className="flex flex-col min-w-0">
+                                        <span className="truncate">{haven.name}</span>
+                                        <span className="text-[10px] text-muted-foreground leading-tight">
+                                            {new Date(haven.createdAt).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}
+                                            {' · '}
+                                            {haven.peopleCount} {haven.peopleCount === 1 ? 'person' : 'people'}
+                                        </span>
+                                    </div>
                                 </Link>
                             </HoverCardTrigger>
                             <HoverCardContent className="w-72" side="right" align="start" sideOffset={12}>

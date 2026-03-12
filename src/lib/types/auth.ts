@@ -23,6 +23,7 @@ export interface UserPreferences {
     emailNotifications: boolean;
     colorPalette: string;
     fontFamily: string;
+    vaultAutoLockSeconds: number;
 }
 
 export interface UpdateProfileRequest {

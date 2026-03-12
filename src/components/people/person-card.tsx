@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { Card, CardContent } from '@/components/ui/card';
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import type { Person } from '@/lib/types/people';
 
@@ -12,6 +12,7 @@ export function PersonCard({ person, havenId }: { person: Person; havenId: strin
             <Card className="transition-shadow hover:shadow-md">
                 <CardContent className="flex items-center gap-3 p-4">
                     <Avatar>
+                        {person.avatarUrl && <AvatarImage src={person.avatarUrl} alt={person.displayName} />}
                         <AvatarFallback>{person.displayName.charAt(0).toUpperCase()}</AvatarFallback>
                     </Avatar>
                     <div className="flex-1 min-w-0">
