@@ -84,11 +84,9 @@ export function ContentCard({ item, havenId }: { item: ContentItem; havenId: str
                     <p className="text-[10px] text-muted-foreground mt-0.5 truncate">
                         Uploaded {formatDate(item.createdAt)} @ {formatTime(item.createdAt)}
                     </p>
-                    {item.fileSize > 0 && (
-                        <p className="text-[10px] text-muted-foreground truncate">
-                            {formatBytes(item.fileSize)}
-                        </p>
-                    )}
+                    <p className="text-[10px] text-muted-foreground truncate">
+                        Size: {formatBytes(item.fileSize || 0)}
+                    </p>
                     <div className="mt-1.5 flex flex-wrap items-center gap-1">
                         <Badge className="text-[10px] sm:text-xs px-1.5 py-0 bg-primary/15 text-primary border-primary/30 hover:bg-primary/20">
                             {ContentTypeLabels[item.contentType]}
