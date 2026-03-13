@@ -83,7 +83,7 @@ export default function RootLayout({
     children: React.ReactNode;
 }>) {
     return (
-        <html lang="en" suppressHydrationWarning className={fontVars} data-palette="lavender" data-font="nunito">
+        <html lang="en" suppressHydrationWarning className={fontVars} data-palette="lavender" data-font="sora">
             <body className="font-sans antialiased" suppressHydrationWarning>
                 <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange={false}>
                     <TooltipProvider>{children}</TooltipProvider>

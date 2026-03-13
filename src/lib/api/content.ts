@@ -10,8 +10,8 @@ export const contentApi = {
     confirmUpload: (havenId: string, contentId: string, data: ConfirmUploadRequest) =>
         api.post<ApiResponse<ContentItem>>(`/havens/${havenId}/content/${contentId}/confirm`, data),
 
-    list: (havenId: string, page = 1, pageSize = 20, type?: ContentType) =>
-        api.get<ApiResponse<PaginatedResult<ContentItem>>>(`/havens/${havenId}/content`, { params: { page, pageSize, type } }),
+    list: (havenId: string, page = 1, pageSize = 20, type?: ContentType, search?: string) =>
+        api.get<ApiResponse<PaginatedResult<ContentItem>>>(`/havens/${havenId}/content`, { params: { page, pageSize, type, search: search || undefined } }),
 
     get: (havenId: string, contentId: string) => api.get<ApiResponse<ContentItem>>(`/havens/${havenId}/content/${contentId}`),
 

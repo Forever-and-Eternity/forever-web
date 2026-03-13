@@ -34,6 +34,7 @@ export interface ContentItem {
     latitude?: number;
     longitude?: number;
     locationName?: string;
+    fileSize: number;
     takenAt?: string;
     createdAt: string;
     annotations: Annotation[];

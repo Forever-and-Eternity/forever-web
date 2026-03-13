@@ -6,10 +6,15 @@ const api = axios.create({
     headers: { 'Content-Type': 'application/json' },
 });
 
+const AUTH_PATHS = ['/auth/login', '/auth/register', '/auth/refresh'];
+
 api.interceptors.request.use((config) => {
-    const token = useAuthStore.getState().accessToken;
-    if (token) {
-        config.headers.Authorization = `Bearer ${token}`;
+    const isAuthPath = AUTH_PATHS.some((p) => config.url?.includes(p));
+    if (!isAuthPath) {
+        const token = useAuthStore.getState().accessToken;
+        if (token) {
+            config.headers.Authorization = `Bearer ${token}`;
+        }
     }
     return config;
 });
@@ -19,7 +24,8 @@ api.interceptors.response.use(
     async (error) => {
         const originalRequest = error.config;
 
-        if (error.response?.status === 401 && !originalRequest._retry) {
+        const isAuthPath = AUTH_PATHS.some((p) => originalRequest.url?.includes(p));
+        if (error.response?.status === 401 && !originalRequest._retry && !isAuthPath) {
             originalRequest._retry = true;
 
             const refreshToken = useAuthStore.getState().refreshToken;

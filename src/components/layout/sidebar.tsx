@@ -122,7 +122,7 @@ export function Sidebar({ onNavigate }: { onNavigate?: () => void } = {}) {
                                     </div>
                                 </Link>
                             </HoverCardTrigger>
-                            <HoverCardContent className="w-72" side="right" align="start" sideOffset={12}>
+                            <HoverCardContent className="w-72" side="right" align="center" sideOffset={12}>
                                 <HavenHoverPreview haven={haven} />
                             </HoverCardContent>
                         </HoverCard>

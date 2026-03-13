@@ -33,11 +33,23 @@ function formatDate(dateStr: string): string {
     return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
 }
 
+function formatTime(dateStr: string): string {
+    const d = new Date(dateStr);
+    return d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+}
+
+function formatBytes(bytes: number): string {
+    if (bytes === 0) return '0 B';
+    const k = 1024;
+    const sizes = ['B', 'KB', 'MB', 'GB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return `${parseFloat((bytes / Math.pow(k, i)).toFixed(1))} ${sizes[i]}`;
+}
+
 export function ContentCard({ item, havenId }: { item: ContentItem; havenId: string }) {
     const Icon = contentTypeIcons[item.contentType] || FileType;
     const iconColor = contentTypeColors[item.contentType] || 'text-muted-foreground';
 
-    // Determine if we can show an image preview
     const canShowImage =
         (item.thumbnailUrl && isImageUrl(item.thumbnailUrl)) ||
         (item.contentType === ContentType.Photo && item.mediaUrl && isImageUrl(item.mediaUrl));
@@ -51,7 +63,7 @@ export function ContentCard({ item, havenId }: { item: ContentItem; havenId: str
     return (
         <Link href={`/havens/${havenId}/content/${item.id}`}>
             <Card className="overflow-hidden transition-shadow hover:shadow-md">
-                <div className="aspect-square bg-muted">
+                <div className="aspect-[4/3] bg-muted">
                     {canShowImage && previewUrl ? (
                         <img
                             src={previewUrl}
@@ -59,23 +71,30 @@ export function ContentCard({ item, havenId }: { item: ContentItem; havenId: str
                             className="h-full w-full object-cover"
                         />
                     ) : (
-                        <div className="flex h-full flex-col items-center justify-center gap-2 text-muted-foreground">
-                            <Icon className={`size-10 ${iconColor}`} />
-                            <span className="text-xs font-medium px-3 text-center truncate max-w-full">
+                        <div className="flex h-full flex-col items-center justify-center gap-1.5 text-muted-foreground">
+                            <Icon className={`size-8 sm:size-10 ${iconColor}`} />
+                            <span className="text-[10px] sm:text-xs font-medium px-2 text-center line-clamp-2 max-w-full">
                                 {item.title || ContentTypeLabels[item.contentType]}
                             </span>
                         </div>
                     )}
                 </div>
-                <CardContent className="p-3">
-                    <p className="truncate text-sm font-medium">{item.title || 'Untitled'}</p>
-                    <p className="text-[10px] text-muted-foreground mt-0.5">{formatDate(item.createdAt)}</p>
-                    <div className="mt-1.5 flex gap-1">
-                        <Badge variant="secondary" className="text-xs">
+                <CardContent className="p-2 sm:p-3">
+                    <p className="truncate text-xs sm:text-sm font-medium">{item.title || 'Untitled'}</p>
+                    <p className="text-[10px] text-muted-foreground mt-0.5 truncate">
+                        Uploaded {formatDate(item.createdAt)} @ {formatTime(item.createdAt)}
+                    </p>
+                    {item.fileSize > 0 && (
+                        <p className="text-[10px] text-muted-foreground truncate">
+                            {formatBytes(item.fileSize)}
+                        </p>
+                    )}
+                    <div className="mt-1.5 flex flex-wrap items-center gap-1">
+                        <Badge className="text-[10px] sm:text-xs px-1.5 py-0 bg-primary/15 text-primary border-primary/30 hover:bg-primary/20">
                             {ContentTypeLabels[item.contentType]}
                         </Badge>
                         {item.annotations.length > 0 && (
-                            <Badge variant="outline" className="text-xs">
+                            <Badge variant="outline" className="text-[10px] sm:text-xs px-1.5 py-0">
                                 {item.annotations.length} notes
                             </Badge>
                         )}

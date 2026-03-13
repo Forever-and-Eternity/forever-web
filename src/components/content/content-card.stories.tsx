@@ -14,6 +14,7 @@ const baseItem: ContentItem = {
     thumbnailUrl: 'https://picsum.photos/id/10/400/400',
     mediaUrl: 'https://picsum.photos/id/10/1200/800',
     tags: ['sunset', 'beach'],
+    fileSize: 2457600,
     createdAt: '2025-06-15T18:30:00Z',
     annotations: [],
     peopleTags: [],

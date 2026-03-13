@@ -538,6 +538,108 @@
   }
 }
 
+/* ── Speech-bubble tooltip ── */
+.tooltip-bubble {
+  --tooltip-border: color-mix(in srgb, var(--primary) 50%, transparent);
+  position: relative;
+  overflow: visible;
+  border-color: var(--tooltip-border);
+  box-shadow:
+    0 4px 16px -4px color-mix(in srgb, var(--primary) 15%, transparent),
+    0 2px 6px -2px oklch(0 0 0 / 0.08);
+}
+
+/* Arrow nub — rotated square with matching border */
+.tooltip-bubble::after {
+  content: '';
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  background: var(--popover);
+  border: 2px solid var(--tooltip-border);
+  border-radius: 2px;
+  transform: rotate(45deg);
+  pointer-events: none;
+}
+
+/* Tooltip below trigger → arrow points UP */
+.tooltip-bubble[data-side="bottom"]::after {
+  top: -7px;
+  left: 50%;
+  margin-left: -5px;
+  border-bottom: none;
+  border-right: none;
+}
+
+/* Tooltip above trigger → arrow points DOWN */
+.tooltip-bubble[data-side="top"]::after {
+  bottom: -7px;
+  left: 50%;
+  margin-left: -5px;
+  border-top: none;
+  border-left: none;
+}
+
+/* Tooltip right of trigger → arrow points LEFT */
+.tooltip-bubble[data-side="right"]::after {
+  left: -7px;
+  top: 50%;
+  margin-top: -5px;
+  border-top: none;
+  border-right: none;
+}
+
+/* Tooltip left of trigger → arrow points RIGHT */
+.tooltip-bubble[data-side="left"]::after {
+  right: -7px;
+  top: 50%;
+  margin-top: -5px;
+  border-bottom: none;
+  border-left: none;
+}
+
+/* ── Speech-bubble enter/exit animations ── */
+@keyframes bubble-enter {
+  0% {
+    opacity: 0;
+    transform: scale(0.3);
+    filter: blur(6px);
+  }
+  50% {
+    opacity: 1;
+    filter: blur(0px);
+  }
+  70% {
+    transform: scale(1.04);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+    filter: blur(0px);
+  }
+}
+
+@keyframes bubble-exit {
+  0% {
+    opacity: 1;
+    transform: scale(1);
+    filter: blur(0px);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(0.4);
+    filter: blur(4px);
+  }
+}
+
+.bubble-animate[data-state="open"] {
+  animation: bubble-enter 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+.bubble-animate[data-state="closed"] {
+  animation: bubble-exit 0.2s cubic-bezier(0.4, 0, 1, 1) forwards;
+}
+
 /* ── Resizable sidebar handle ── */
 .sidebar-resize-handle {
   position: absolute;
@@ -555,6 +657,103 @@
   background-color: var(--primary);
   opacity: 0.4;
   border-radius: 3px;
+}
+
+/* ── Toast comet border animation ── */
+@property --toast-comet {
+  syntax: "<angle>";
+  inherits: false;
+  initial-value: 180deg;
+}
+
+@property --toast-trail {
+  syntax: "<angle>";
+  inherits: false;
+  initial-value: 180deg;
+}
+
+@keyframes toast-comet-trace {
+  0%   { --toast-comet: 180deg; }
+  100% { --toast-comet: 540deg; }
+}
+
+@keyframes toast-trail-fill {
+  0%   { --toast-trail: 180deg; }
+  100% { --toast-trail: 540deg; }
+}
+
+@keyframes toast-comet-fade {
+  0%   { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+[data-sonner-toast] {
+  --toast-color: var(--primary);
+  --toast-border-subtle: color-mix(in srgb, var(--toast-color) 25%, transparent);
+  position: relative !important;
+  overflow: visible !important;
+  border: none !important;
+  border-radius: 1rem !important;
+  box-shadow: 0 4px 20px -4px oklch(0 0 0 / 0.08) !important;
+}
+
+[data-sonner-toast][data-type="error"] {
+  --toast-color: var(--destructive);
+}
+
+/* Trail layer — fills in behind the comet, stays as a subtle border */
+[data-sonner-toast]::after {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  padding: 1px;
+  background: conic-gradient(
+    from 180deg,
+    var(--toast-border-subtle) 0deg,
+    var(--toast-border-subtle) calc(var(--toast-trail) - 180deg),
+    transparent calc(var(--toast-trail) - 180deg)
+  );
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  mask-composite: exclude;
+  pointer-events: none;
+  animation: toast-trail-fill 1.3s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+/* Comet head — bright tip that traces and then fades out */
+[data-sonner-toast]::before {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  padding: 1px;
+  background: conic-gradient(
+    from var(--toast-comet),
+    oklch(1 0 0 / 0.95) 0deg,
+    var(--toast-color) 5deg,
+    color-mix(in srgb, var(--toast-color) 40%, transparent) 15deg,
+    transparent 30deg,
+    transparent 360deg
+  );
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  mask-composite: exclude;
+  pointer-events: none;
+  z-index: 1;
+  animation:
+    toast-comet-trace 1.3s cubic-bezier(0.4, 0, 0.2, 1) forwards,
+    toast-comet-fade 0.3s 1.3s ease-out forwards;
 }
 
 /* ── Animations ── */
