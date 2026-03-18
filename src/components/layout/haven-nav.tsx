@@ -3,7 +3,6 @@
 import Link from 'next/link';
 import { usePathname, useParams } from 'next/navigation';
 import { cn } from '@/lib/utils';
-import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import {
     Images,
@@ -40,8 +39,7 @@ export function HavenNav() {
     ];
 
     return (
-        <div className="hidden md:block border-b bg-card/50 backdrop-blur-sm">
-            <ScrollArea className="w-full">
+        <div className="hidden md:block sticky top-0 z-30 border-b bg-card/80 backdrop-blur-md">
                 <nav className="flex flex-nowrap items-center justify-center gap-0.5 sm:gap-1 px-2 sm:px-4 py-2.5">
                     {navItems.map((item) => {
                         const isActive =
@@ -93,8 +91,6 @@ export function HavenNav() {
                         </TooltipContent>
                     </Tooltip>
                 </nav>
-                <ScrollBar orientation="horizontal" />
-            </ScrollArea>
         </div>
     );
 }

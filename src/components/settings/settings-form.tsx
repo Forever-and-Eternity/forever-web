@@ -256,7 +256,7 @@ export function SettingsForm() {
     const isDark = resolvedTheme === 'dark';
 
     return (
-        <div className="max-w-2xl space-y-6">
+        <div className="max-w-2xl mx-auto space-y-6">
             {/* Profile Section */}
             <Card>
                 <CardHeader>
