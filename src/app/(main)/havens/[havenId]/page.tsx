@@ -141,8 +141,7 @@ export default function HavenDetailPage() {
 
     const sections = [
         { label: 'Content', href: `/havens/${havenId}/content`, count: haven.contentCount, desc: 'Photos & documents' },
-        { label: 'People', href: `/havens/${havenId}/people`, count: haven.peopleCount, desc: 'Tagged people' },
-        { label: 'Members', href: `/havens/${havenId}/members`, count: haven.memberCount, desc: 'Haven members' },
+        { label: 'People', href: `/havens/${havenId}/people`, count: haven.peopleCount, desc: 'People & members' },
         { label: 'Journals', href: `/havens/${havenId}/journals`, count: haven.diaryCount, desc: 'Diary entries' },
         { label: 'Capsules', href: `/havens/${havenId}/capsules`, count: haven.capsuleCount, desc: 'Time capsules' },
         { label: 'Lessons', href: `/havens/${havenId}/lessons`, count: haven.lessonCount, desc: 'Life lessons' },
