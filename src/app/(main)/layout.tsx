@@ -93,7 +93,10 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
             <MobileNav />
             <div className="flex flex-1 flex-col overflow-hidden min-w-0">
                 <Header />
-                <main className="flex-1 overflow-y-auto p-4 sm:p-6">{children}</main>
+                <main className={cn(
+                    'flex-1 overflow-y-auto',
+                    user?.preferences?.compactMode ? 'p-2 sm:p-3' : 'p-4 sm:p-6',
+                )}>{children}</main>
             </div>
             <Toaster />
         </div>

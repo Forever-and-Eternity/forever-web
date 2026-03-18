@@ -1,17 +1,22 @@
 'use client';
 
 import { useEffect, useState, useCallback } from 'react';
-import { Search } from 'lucide-react';
+import { Search, LayoutGrid, List } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { ContentCard } from './content-card';
+import { ContentListItem } from './content-list-item';
 import { contentApi } from '@/lib/api/content';
 import { ContentType, ContentTypeLabels } from '@/lib/types/enums';
 import type { ContentItem } from '@/lib/types/content';
+import { useAuthStore } from '@/lib/stores/auth-store';
 
 export function ContentGrid({ havenId }: { havenId: string }) {
+    const prefs = useAuthStore((s) => s.user?.preferences);
+    const [layout, setLayout] = useState<'grid' | 'list'>((prefs?.contentLayout as 'grid' | 'list') || 'grid');
+    const compact = prefs?.compactMode ?? false;
     const [items, setItems] = useState<ContentItem[]>([]);
     const [loading, setLoading] = useState(true);
     const [typeFilter, setTypeFilter] = useState<string>('all');
@@ -77,6 +82,24 @@ export function ContentGrid({ havenId }: { havenId: string }) {
                         ))}
                     </SelectContent>
                 </Select>
+                <div className="flex border rounded-md">
+                    <Button
+                        variant={layout === 'grid' ? 'secondary' : 'ghost'}
+                        size="icon"
+                        className="h-9 w-9 rounded-r-none"
+                        onClick={() => setLayout('grid')}
+                    >
+                        <LayoutGrid className="h-4 w-4" />
+                    </Button>
+                    <Button
+                        variant={layout === 'list' ? 'secondary' : 'ghost'}
+                        size="icon"
+                        className="h-9 w-9 rounded-l-none"
+                        onClick={() => setLayout('list')}
+                    >
+                        <List className="h-4 w-4" />
+                    </Button>
+                </div>
             </div>
 
             {loading && items.length === 0 ? (
@@ -91,11 +114,19 @@ export function ContentGrid({ havenId }: { havenId: string }) {
                 </p>
             ) : (
                 <>
-                    <div className="grid gap-3 grid-cols-2 sm:grid-cols-3 lg:grid-cols-4">
+                    {layout === 'grid' ? (
+                    <div className={compact ? "grid gap-1.5 grid-cols-3 sm:grid-cols-4 lg:grid-cols-5" : "grid gap-3 grid-cols-2 sm:grid-cols-3 lg:grid-cols-4"}>
                         {items.map((item) => (
                             <ContentCard key={item.id} item={item} havenId={havenId} />
                         ))}
                     </div>
+                    ) : (
+                    <div className={compact ? "flex flex-col gap-1" : "flex flex-col gap-2"}>
+                        {items.map((item) => (
+                            <ContentListItem key={item.id} item={item} havenId={havenId} />
+                        ))}
+                    </div>
+                    )}
                     {hasMore && (
                         <div className="mt-6 text-center">
                             <Button variant="outline" onClick={() => setPage((p) => p + 1)} disabled={loading}>
