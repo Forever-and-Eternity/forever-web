@@ -42,7 +42,7 @@ export function HavenNav() {
     return (
         <div className="hidden md:block border-b bg-card/50 backdrop-blur-sm">
             <ScrollArea className="w-full">
-                <nav className="flex flex-nowrap items-center justify-center gap-0.5 sm:gap-1 px-2 sm:px-4 py-1.5">
+                <nav className="flex flex-nowrap items-center justify-center gap-0.5 sm:gap-1 px-2 sm:px-4 py-2.5">
                     {navItems.map((item) => {
                         const isActive =
                             pathname === item.href || pathname.startsWith(item.href + '/');
