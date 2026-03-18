@@ -11,11 +11,12 @@ import { useUiStore } from '@/lib/stores/ui-store';
 import { authApi } from '@/lib/api/auth';
 import { cn } from '@/lib/utils';
 import { Toaster } from '@/components/ui/sonner';
+import { SplashScreen } from '@/components/layout/splash-screen';
 
 function applyAppearancePreferences(palette?: string, font?: string) {
     const root = document.documentElement;
     root.setAttribute('data-palette', palette || 'lavender');
-    root.setAttribute('data-font', font || 'nunito');
+    root.setAttribute('data-font', font || 'sora');
 }
 
 export default function MainLayout({ children }: { children: React.ReactNode }) {
@@ -24,6 +25,14 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
     const { hydrate, isAuthenticated, user, setUser } = useAuthStore();
     const sidebarOpen = useUiStore((s) => s.sidebarOpen);
     const [ready, setReady] = useState(false);
+    const [splashDone, setSplashDone] = useState(false);
+
+    useEffect(() => {
+        // Skip splash if we've already shown it this session
+        if (sessionStorage.getItem('forever-splash-shown')) {
+            setSplashDone(true);
+        }
+    }, []);
 
     useEffect(() => {
         hydrate();
@@ -70,6 +79,13 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
     }
 
     return (
+        <>
+        {!splashDone && (
+            <SplashScreen onComplete={() => {
+                setSplashDone(true);
+                sessionStorage.setItem('forever-splash-shown', '1');
+            }} />
+        )}
         <div className="flex h-dvh">
             <div className={cn('hidden md:block', !sidebarOpen && 'md:hidden')}>
                 <Sidebar />
@@ -81,5 +97,6 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
             </div>
             <Toaster />
         </div>
+        </>
     );
 }

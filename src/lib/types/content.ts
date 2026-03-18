@@ -35,6 +35,7 @@ export interface ContentItem {
     longitude?: number;
     locationName?: string;
     fileSize: number;
+    isEncrypted: boolean;
     takenAt?: string;
     createdAt: string;
     annotations: Annotation[];

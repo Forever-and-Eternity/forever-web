@@ -70,6 +70,11 @@ export function LoginForm() {
                             </button>
                         </div>
                     </div>
+                    <div className="flex justify-end">
+                        <Link href="/forgot-password" className="text-xs text-muted-foreground hover:text-primary transition-colors">
+                            Forgot password?
+                        </Link>
+                    </div>
                     <Button type="submit" className="w-full bg-gradient-ig text-white hover:opacity-90 font-semibold" disabled={loading}>
                         {loading ? 'Signing in...' : 'Sign in'}
                     </Button>

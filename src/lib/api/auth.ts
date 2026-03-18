@@ -31,6 +31,11 @@ export const authApi = {
     confirmAvatar: (avatarKey: string) =>
         api.put<ApiResponse<UserProfile>>('/auth/avatar-confirm', { avatarKey }),
 
+    forgotPassword: (email: string) => api.post<ApiResponse>('/auth/forgot-password', { email }),
+
+    resetPassword: (token: string, newPassword: string) =>
+        api.post<ApiResponse>('/auth/reset-password', { token, newPassword }),
+
     async uploadAvatar(file: File): Promise<UserProfile | null> {
         const { data: urlRes } = await this.getAvatarUploadUrl(file.name, file.size, file.type || 'image/jpeg');
         if (!urlRes.success || !urlRes.data) return null;

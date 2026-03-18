@@ -19,7 +19,7 @@ const mockUser: UserProfile = {
         showAnnotationsInFeed: true,
         emailNotifications: true,
         colorPalette: 'lavender',
-        fontFamily: 'nunito',
+        fontFamily: 'sora',
         vaultAutoLockSeconds: 60,
     },
 };

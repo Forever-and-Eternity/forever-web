@@ -11,6 +11,7 @@ import {
 } from 'next/font/google';
 import { ThemeProvider } from 'next-themes';
 import { TooltipProvider } from '@/components/ui/tooltip';
+import { DemoBanner } from '@/components/layout/demo-banner';
 import './globals.css';
 
 const nunito = Nunito({
@@ -62,12 +63,12 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 const fontVars = [
+    sora.variable,
     nunito.variable,
     plusJakartaSans.variable,
     outfit.variable,
     dmSans.variable,
     manrope.variable,
-    sora.variable,
     spaceGrotesk.variable,
     jetbrainsMono.variable,
 ].join(' ');
@@ -86,6 +87,7 @@ export default function RootLayout({
         <html lang="en" suppressHydrationWarning className={fontVars} data-palette="lavender" data-font="sora">
             <body className="font-sans antialiased" suppressHydrationWarning>
                 <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange={false}>
+                    <DemoBanner />
                     <TooltipProvider>{children}</TooltipProvider>
                 </ThemeProvider>
             </body>

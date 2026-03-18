@@ -1,15 +1,20 @@
+'use client';
+
 import Link from 'next/link';
-import { Heart } from 'lucide-react';
+import { Heart, Cookie } from 'lucide-react';
+import { useCookieConsent } from '@/lib/hooks/use-cookie-consent';
 
 const footerLinks = [
     { label: 'Features', href: '#features' },
     { label: 'Pricing', href: '#pricing' },
-    { label: 'About', href: '#' },
-    { label: 'Privacy', href: '#' },
-    { label: 'Terms', href: '#' },
+    { label: 'About', href: '#about' },
+    { label: 'Privacy', href: '/privacy' },
+    { label: 'Terms', href: '/terms' },
 ];
 
 export function Footer() {
+    const { resetConsent } = useCookieConsent();
+
     return (
         <footer className="border-t px-4 py-12">
             <div className="mx-auto max-w-6xl">
@@ -32,6 +37,13 @@ export function Footer() {
                                 {link.label}
                             </Link>
                         ))}
+                        <button
+                            onClick={resetConsent}
+                            className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors"
+                        >
+                            <Cookie className="h-3.5 w-3.5" />
+                            Cookie Settings
+                        </button>
                     </nav>
                     <p className="text-sm text-muted-foreground">
                         &copy; {new Date().getFullYear()} Forever. All rights reserved.

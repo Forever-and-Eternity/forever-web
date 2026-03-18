@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { FileText, Film, Mic, FileType, ImageIcon } from 'lucide-react';
+import { FileText, Film, Mic, FileType, ImageIcon, Lock } from 'lucide-react';
 import { ContentType, ContentTypeLabels } from '@/lib/types/enums';
 import type { ContentItem } from '@/lib/types/content';
 
@@ -63,7 +63,13 @@ export function ContentCard({ item, havenId }: { item: ContentItem; havenId: str
     return (
         <Link href={`/havens/${havenId}/content/${item.id}`}>
             <Card className="overflow-hidden transition-shadow hover:shadow-md">
-                <div className="aspect-[4/3] bg-muted">
+                <div className="relative aspect-[4/3] bg-muted">
+                    {item.isEncrypted && (
+                        <div className="absolute top-1.5 right-1.5 z-10 flex items-center gap-1 rounded-full bg-background/80 backdrop-blur-sm px-1.5 py-0.5 text-[10px] font-medium text-primary shadow-sm">
+                            <Lock className="h-2.5 w-2.5" />
+                            Encrypted
+                        </div>
+                    )}
                     {canShowImage && previewUrl ? (
                         <img
                             src={previewUrl}

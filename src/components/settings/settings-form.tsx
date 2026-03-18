@@ -54,12 +54,12 @@ const PALETTES = [
 
 /* ─── Font config ─── */
 const FONTS = [
+    { key: 'sora', label: 'Sora', category: 'Modern', cssVar: '--font-sora' },
     { key: 'nunito', label: 'Nunito', category: 'Rounded', cssVar: '--font-nunito' },
     { key: 'plus-jakarta-sans', label: 'Plus Jakarta Sans', category: 'Geometric', cssVar: '--font-plus-jakarta-sans' },
     { key: 'outfit', label: 'Outfit', category: 'Geometric', cssVar: '--font-outfit' },
     { key: 'dm-sans', label: 'DM Sans', category: 'Neutral', cssVar: '--font-dm-sans' },
     { key: 'manrope', label: 'Manrope', category: 'Neutral', cssVar: '--font-manrope' },
-    { key: 'sora', label: 'Sora', category: 'Modern', cssVar: '--font-sora' },
     { key: 'space-grotesk', label: 'Space Grotesk', category: 'Sharp', cssVar: '--font-space-grotesk' },
 ] as const;
 
@@ -100,7 +100,7 @@ export function SettingsForm() {
         showAnnotationsInFeed: true,
         emailNotifications: true,
         colorPalette: 'lavender',
-        fontFamily: 'nunito',
+        fontFamily: 'sora',
         vaultAutoLockSeconds: 60,
     });
 
@@ -115,7 +115,7 @@ export function SettingsForm() {
                     showAnnotationsInFeed: res.data.showAnnotationsInFeed ?? true,
                     emailNotifications: res.data.emailNotifications ?? true,
                     colorPalette: res.data.colorPalette || 'lavender',
-                    fontFamily: res.data.fontFamily || 'nunito',
+                    fontFamily: res.data.fontFamily || 'sora',
                     vaultAutoLockSeconds: res.data.vaultAutoLockSeconds ?? 60,
                 };
                 setPreferences(prefs);
@@ -164,11 +164,11 @@ export function SettingsForm() {
             if (res.success && res.data) {
                 setPreferences(res.data);
                 setTheme(res.data.theme || 'system');
-                applyLivePreview(res.data.colorPalette || 'lavender', res.data.fontFamily || 'nunito');
+                applyLivePreview(res.data.colorPalette || 'lavender', res.data.fontFamily || 'sora');
                 savedRef.current = true;
                 initialPrefsRef.current = {
                     palette: res.data.colorPalette || 'lavender',
-                    font: res.data.fontFamily || 'nunito',
+                    font: res.data.fontFamily || 'sora',
                     theme: res.data.theme || 'system',
                 };
 
